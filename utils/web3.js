@@ -1,7 +1,7 @@
 import axios from "axios";
 import { ethers } from "ethers";
 
-const PdcFactoryContractAbi = require("../abi/pdcFactory.json");
+const PdcFactoryContractAbi = require("../abi/pdcfactory.json");
 const provider = new ethers.providers.JsonRpcProvider(
   "https://rpc-mumbai.maticvigil.com/"
 );

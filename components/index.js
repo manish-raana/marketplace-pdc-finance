@@ -1,16 +1,7 @@
-export { default as Sidebar } from "./Sidebar";
 export { default as Footer } from "./footer";
 export { default as NavBar } from "./navbar";
 export { default as Layout } from "./layout";
-export { default as CreatePdc } from "./CreatePdc";
-export { default as Withdraw } from "./Withdraw";
-export { default as ViewPdc } from "./ViewPdc";
 export { default as Marketplace } from "./Marketplace";
 export { default as Modal } from "./Modal";
 export { default as Loading } from "./Icons/Loading";
-export { default as TokenFaucet } from "./TokenFaucet";
-export { default as MaticFaucet } from "./MaticFaucet";
-export { default as ConfirmModal } from "./ConfirmModal";
-export { default as AvailablePdc } from "./AvailablePdc";
 export { default as NftDetails } from "./NftDetails";
-export { default as HowItWorks } from "./HowItWorks";
