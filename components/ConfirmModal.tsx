@@ -9,10 +9,11 @@ import TokenFaucetABI from "../abi/tokenFaucetABI.json";
 import Link from "next/link";
 import { ethers } from "ethers";
 
-const ConfirmModal = ({ showModal, setShowModal,tokenId, NftData, NftPayer, NftPayerUd, IsTokenApproved, setIsTokenApproved, Discount , payableAmount}: any) => {
+const ConfirmModal = ({ showModal, setShowModal,tokenId, NftData, NftPayer, NftPayerUd, IsTokenApproved, setIsTokenApproved, Discount , payableAmount, setNftOwner}: any) => {
   const [loading, setLoading] = useState(false);
   const [IsPdc, setIsPdc] = useState(false);
-  const [pdcHash, setPdcHash] = useState("");
+  const [TxHash, setTxHash] = useState("");
+  
   const shortAddress = (address: string) => {
     return address.slice(0, 6) + "..." + address.slice(-4);
   };
@@ -41,16 +42,20 @@ const ConfirmModal = ({ showModal, setShowModal,tokenId, NftData, NftPayer, NftP
       const pdcNftMarketPlaceAddress = process.env.NEXT_PUBLIC_PDC_MARKETPLACE || "";
       const contract = await sdk?.getContract(pdcNftMarketPlaceAddress, PdcNftMarketplaceABI);
       const txResponse: any = await contract?.call("createMarketSale", parseInt(tokenId), Discount * 100);
-      //console.log(txResponse);
-      if (txResponse && txResponse.receipt) { 
+      console.log(txResponse);
+      if (txResponse && txResponse.receipt) {
         successAlert('You bought NFT Successfully!');
+        setTxHash(txResponse.receipt)
+        setNftOwner();
+        handleModalClose();
+
       }
     } catch (error) {
       console.log(error)
     }
   };
   const handleModalClose = () => {
-    setPdcHash("");
+    setTxHash("");
     setLoading(false);
     setIsPdc(false);
     setShowModal(false);

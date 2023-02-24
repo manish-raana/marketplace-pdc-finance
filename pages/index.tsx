@@ -7,6 +7,7 @@ import Head from 'next/head'
 import Countdown from "react-countdown";
 
 import { formatDate } from '../utils/web3'
+import { CountDownTimer } from "../components";
 
 const Marketplace = () => {
   const [NftList, setNftList] = useState<Array<any>>([]);
@@ -32,16 +33,8 @@ const Marketplace = () => {
       const nftResponse = await alchemy.nft.getNftsForContract(pdc_nft_address);
       if (nftResponse && nftResponse.nfts && nftResponse.nfts.length > 0) {
         //console.log(nftResponse);
-        const nfts = [
-          ...nftResponse.nfts,
-          ...nftResponse.nfts,
-          ...nftResponse.nfts,
-          ...nftResponse.nfts,
-          ...nftResponse.nfts,
-          ...nftResponse.nfts,
-          ...nftResponse.nfts,
-        ];
-        setNftList(nfts);
+        
+        setNftList(nftResponse.nfts);
         GlobalStates.setNftList(nftResponse.nfts);
       }
     } catch (error) {
@@ -193,13 +186,22 @@ const Marketplace = () => {
             {NftList.map((item: any, index: number) => (
               <div className="p-4 lg:w-1/3" key={index}>
                 <Link href={`/pdc/${item?.tokenId}`}>
-                  <div className="h-full cursor-pointer bg-gray-50 p-2 hover:shadow-xl hover:scale-105 transition duration-300 ease-in-out rounded-xl overflow-hidden relative">
+                  <div className="h-full relative cursor-pointer bg-gray-50 p-2 hover:shadow-xl hover:scale-105 transition duration-300 ease-in-out rounded-xl overflow-hidden">
+                    
                     <Image src={item.media[0].raw} loading="lazy" width={500} height={250} alt="img" />
+                    <div className="absolute top-8 right-3">
+                      {item?.rawMetadata?.attributes[1].value * 1000 > Date.now() ? (
+                        <CountDownTimer endTime={item?.rawMetadata?.attributes[1].value} />
+                      ) : (
+                        <p className='mr-3 text-rose-500'>Expired</p>
+                      )}
+                    </div>
                     <div className="flex items-center justify-between">
                       <p className="mb-2 font-bold text-start">
                         {item.title} - {item.tokenId}
                       </p>
-                      <Countdown date={item?.rawMetadata?.attributes[1].value * 1000} />
+                      {/* <Countdown date={item?.rawMetadata?.attributes[1].value * 1000} /> */}
+
                       <Link
                         href={"https://testnets.opensea.io/assets/mumbai/" + process.env.NEXT_PUBLIC_PDC_NFT_CONTRACT_ADDRESS + "/" + item?.tokenId}
                       >

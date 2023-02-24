@@ -14,6 +14,7 @@ import TokenFaucetABI from "../abi/tokenFaucetABI.json";
 import {formatDate,convertDate, hexToEth} from '../utils/web3'
 import { successAlert } from "../utils/alerts";
 import ConfirmModal from "./ConfirmModal";
+
 const NftDetails = ({ pdcId }: any) => {
   const GlobalState = useContext(AppContext);
   const [NftData, setNftData] = useState<NFTModel>();
@@ -24,6 +25,9 @@ const NftDetails = ({ pdcId }: any) => {
   const [DiscountValue, setDiscountValue] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [IsApproved, setIsApproved] = useState(false);
+  const [IsApproving, setIsApproving] = useState(false);
+  const [IsLoadingDiscount, setIsLoadingDiscount] = useState(true);
+  const [IsLoadingNftData, setIsLoadingNftData] = useState(true);
   const [IsTokenApproved, setIsTokenApproved] = useState(false);
   const address = useAddress();
   const settings = {
@@ -45,11 +49,12 @@ const NftDetails = ({ pdcId }: any) => {
         getNftPayer(PdcNft.rawMetadata?.attributes[2]?.value);
         getNftOwner(PdcNft.contract.address, PdcNft.tokenId);
         getApproveStatus(PdcNft.tokenId);
-        getNftListingStatus(PdcNft.tokenId);
+        getNftListingStatus(PdcNft.tokenId, PdcNft);
       }
     } else {
       
       try {
+        setIsLoadingNftData(true);
         GlobalState.setIsLoading(true);
         
         const pdc_nft_address =
@@ -62,15 +67,16 @@ const NftDetails = ({ pdcId }: any) => {
           setNftData(nftResponse);
           getNftPayer(nftResponse.rawMetadata?.attributes[2]?.value);
         
-          //console.log("getting from api: ", nftResponse);
+          console.log("getting from api: ", nftResponse);
           getNftOwner(nftResponse.contract.address, nftResponse.tokenId);
           getApproveStatus(nftResponse.tokenId);
-          getNftListingStatus(nftResponse.tokenId);
+          getNftListingStatus(nftResponse.tokenId, nftResponse);
         }
       } catch (error) {
         console.log("error:  ", error);
       } finally {
         GlobalState.setIsLoading(false);
+        setIsLoadingNftData(false)
       }
     }
   };
@@ -144,26 +150,31 @@ const NftDetails = ({ pdcId }: any) => {
       }
     } catch (error) {
       console.log(error)
+    }finally{
+  
     }
   }
-  
-  const getNftListingStatus = async (tokenId:string) => {
+  const getNftListingStatus = async (tokenId:string, nftResponse:any) => {
     try {
+      setIsLoadingDiscount(true);
       const pdcNftMarketPlaceAddress = process.env.NEXT_PUBLIC_PDC_MARKETPLACE || "";
       const contract = await sdk?.getContract(pdcNftMarketPlaceAddress, PdcNftMarketplaceABI);
       const statusResponse: any = await contract?.call("marketItems", parseInt(tokenId));
-      console.log("getNftListingStatus: ", statusResponse);
-      console.log("discountPct: ", parseInt((statusResponse?.discountPct).toString()));
+      console.log('discountPct: ',statusResponse.discountPct.toString());
       setDiscountPercent(parseInt((statusResponse?.discountPct).toString()))
-
-      const calActualAmountResponse = await contract?.call("_calcActualPrice",NftData?.rawMetadata?.attributes[4]?.value, DiscountPercent, NftData?.rawMetadata?.attributes[1]?.value);
-      console.log('_calcActualPrice: ',calActualAmountResponse)
+      
+      //console.log("NftData: ", nftResponse); 
+      //console.log("discountPct: ", DiscountPercent,'  token Amount: ',nftResponse?.rawMetadata?.attributes[4]?.value, '  time: ', nftResponse?.rawMetadata?.attributes[1]?.value);
+      const calActualAmountResponse = await contract?.call("_calcActualPrice",nftResponse?.rawMetadata?.attributes[4]?.value, parseInt((statusResponse?.discountPct).toString()), nftResponse?.rawMetadata?.attributes[1]?.value);
+      //console.log('_calcActualPrice: ',calActualAmountResponse)
       if(calActualAmountResponse && calActualAmountResponse?.discountedAmount){
-        setDiscountValue(parseInt(calActualAmountResponse?.discountedAmount?.toString()));
+          console.log('discount: ',calActualAmountResponse.discountedAmount.toString())
+          setDiscountValue(parseInt(calActualAmountResponse.discountedAmount.toString()));
+          setIsLoadingDiscount(false);
       }
-
     } catch (error) {
       console.log(error)
+      setIsLoadingDiscount(false);
     }
   }
   const handleSellNft = async (tokenId:string) => {
@@ -182,16 +193,19 @@ const NftDetails = ({ pdcId }: any) => {
   }
   const handleApprove = async (tokenId:string) => {
     try {
+      setIsApproving(true)
       const pdcNftContractAddress = process.env.NEXT_PUBLIC_PDC_NFT_CONTRACT_ADDRESS || "";
       const contract = await sdk?.getContract(pdcNftContractAddress, PdcNftABI);
       const approveResponse: any = await contract?.call("approve", process.env.NEXT_PUBLIC_PDC_MARKETPLACE, parseInt(tokenId));
       //console.log("approveResponse: ", approveResponse);
       if (approveResponse && approveResponse.receipt) {
         successAlert("Approved successfully!");
-        setIsApproved(true);
+        setIsApproved(false);
       }
     } catch (error) {
       console.log(error);
+    }finally{
+      setIsApproving(false)
     }
   }
   useEffect(() => {
@@ -214,6 +228,7 @@ const NftDetails = ({ pdcId }: any) => {
         setIsTokenApproved={setIsTokenApproved}
         Discount={DiscountPercent/100}
         payableAmount={NftData?.rawMetadata?.attributes[4]?.value - DiscountValue}
+        setNftOwner={setNftOwner}
       />
       <div className="w-full scrollbar-hide h-screen overflow-scroll flex flex-col my-10 py-10 md:p-10 items-center">
         <div className="flex justify-between w-full md:w-2/3 items-center px-5 md:px-10">
@@ -272,11 +287,8 @@ const NftDetails = ({ pdcId }: any) => {
                 </div>
                 <div className=" w-full flex justify-between text-lg font-bold">
                   <div className="col text-start">Payable Amount</div>
-                  <div className="col text-end flex items-center">
-                    <p className={`${DiscountPercent > 0 ? "line-through pr-5 text-gray-400" : ""}`}>{NftData?.rawMetadata?.attributes[4]?.value}</p>
-                    {DiscountValue && DiscountValue > 0 && (
-                      <p>{NftData.rawMetadata?.attributes[4]?.value - DiscountValue} </p>
-                    )}
+                  <div className="col text-end flex items-center">  
+                    <p>{IsLoadingDiscount ? <img className="w-4 h-4" src="/loader.svg" alt="loader" /> : NftData.rawMetadata?.attributes[4]?.value - DiscountValue} </p>
                   </div>
                 </div>
                 {DiscountPercent > 0 && (
@@ -309,7 +321,8 @@ const NftDetails = ({ pdcId }: any) => {
                         className="btn btn-wide border-none bg-orange-500 hover:bg-orange-600 text-white font-bold"
                         disabled={IsApproved}
                       >
-                        {IsApproved ? "Approved" : "Approve"}
+                        {IsApproving ? <p className='flex'>Approving <img className="w-4 h-4 ml-5" src="/loader.svg" alt="loader" /></p> : IsApproved ? "Approved" : "Approve" } 
+                       
                       </button>
                     </div>
                   )}

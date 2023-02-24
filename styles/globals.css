@@ -38,3 +38,16 @@ a {
   background-color: rgb(19 23 64 / 0.5);
 }
 
+
+.coutndown {
+  display: flex;
+  justify-content: space-around;
+  font-family: sans-serif;
+  text-align: center;
+  padding-top: 0px;
+}
+
+.time-wrapper {
+  font-size: 10px;
+  font-style:bold;
+}
