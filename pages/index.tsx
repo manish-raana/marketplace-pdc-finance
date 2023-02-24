@@ -177,19 +177,6 @@ const Marketplace = () => {
                 <option value={2}>Payment Date</option>
                 <option value={3}>Token Amount</option>
               </select>
-              <select
-                value={0}
-                onChange={handleFiltering}
-                className="select border border-purple-600 focus:outline-none select-primary w-1/2 mt-5 md:mt-0 md:max-w-xs ml-5 rounded-xl"
-              >
-                <option value={0} disabled>
-                  Filter
-                </option>
-                <option value={1}>All</option>
-                <option value={2}>Owned by You</option>
-                <option value={2}>Available PDCs</option>
-                <option value={2}>Expired PDCs</option>
-              </select>
             </div>
           </form>
           <div className="flex flex-wrap -m-4 mt-10">
