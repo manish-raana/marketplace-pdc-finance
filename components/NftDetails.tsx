@@ -29,6 +29,8 @@ const NftDetails = ({ pdcId }: any) => {
   const [IsLoadingDiscount, setIsLoadingDiscount] = useState(true);
   const [IsLoadingNftData, setIsLoadingNftData] = useState(true);
   const [IsTokenApproved, setIsTokenApproved] = useState(false);
+  const [IsListedForSale, setIsListedForSale] = useState(false);
+
   const address = useAddress();
   const settings = {
     apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY, // Replace with your Alchemy API Key.
@@ -126,13 +128,11 @@ const NftDetails = ({ pdcId }: any) => {
       const tokenFaucetAddress = process.env.NEXT_PUBLIC_TOKEN_FAUCET_ADDRESS || "";
       const contract = await sdk?.getContract(tokenFaucetAddress, TokenFaucetABI);
       const allowanceStatusResponse: any = await contract?.call("allowance", walletAddress, process.env.NEXT_PUBLIC_PDC_MARKETPLACE);
-      console.log("allowanceStatusResponse: ", allowanceStatusResponse.toString());
+      //console.log("allowanceStatusResponse: ", allowanceStatusResponse.toString());
       if (allowanceStatusResponse && parseInt(allowanceStatusResponse.toString()) > 0) {
         setIsTokenApproved(true);
-        console.log('true');
       } else {
         setIsTokenApproved(false);
-        console.log('false');
       }
     } catch (error) {
       console.log(error);
@@ -154,7 +154,7 @@ const NftDetails = ({ pdcId }: any) => {
   
     }
   }
-  const deleteListing = async (tokenId:string){
+  const deleteListing = async (tokenId:string) => {
     //deleteMarketItem(tokenId)
   }
   const getNftListingStatus = async (tokenId:string, nftResponse:any) => {
@@ -163,11 +163,13 @@ const NftDetails = ({ pdcId }: any) => {
       const pdcNftMarketPlaceAddress = process.env.NEXT_PUBLIC_PDC_MARKETPLACE || "";
       const contract = await sdk?.getContract(pdcNftMarketPlaceAddress, PdcNftMarketplaceABI);
       const statusResponse: any = await contract?.call("marketItems", parseInt(tokenId));
-      console.log('discountPct: ',statusResponse.discountPct.toString());
+      console.log('marketItems: ',statusResponse);
       setDiscountPercent(parseInt((statusResponse?.discountPct).toString()))
-      
-      //console.log("NftData: ", nftResponse); 
-      //console.log("discountPct: ", DiscountPercent,'  token Amount: ',nftResponse?.rawMetadata?.attributes[4]?.value, '  time: ', nftResponse?.rawMetadata?.attributes[1]?.value);
+      if(statusResponse?.tokenId.toString() == tokenId && statusResponse?.state == 0){
+        setIsListedForSale(true);
+      }else{
+        setIsListedForSale(false);
+      }
       const calActualAmountResponse = await contract?.call("_calcActualPrice",nftResponse?.rawMetadata?.attributes[4]?.value, parseInt((statusResponse?.discountPct).toString()), nftResponse?.rawMetadata?.attributes[1]?.value);
       //console.log('_calcActualPrice: ',calActualAmountResponse)
       if(calActualAmountResponse && calActualAmountResponse?.discountedAmount){
@@ -229,7 +231,7 @@ const NftDetails = ({ pdcId }: any) => {
         NftPayerUd={NftPayerUd}
         IsTokenApproved={IsTokenApproved}
         setIsTokenApproved={setIsTokenApproved}
-        Discount={DiscountPercent/100}
+        Discount={DiscountPercent / 100}
         payableAmount={NftData?.rawMetadata?.attributes[4]?.value - DiscountValue}
         setNftOwner={setNftOwner}
       />
@@ -290,8 +292,14 @@ const NftDetails = ({ pdcId }: any) => {
                 </div>
                 <div className=" w-full flex justify-between text-lg font-bold">
                   <div className="col text-start">Payable Amount</div>
-                  <div className="col text-end flex items-center">  
-                    <p>{IsLoadingDiscount ? <img className="w-4 h-4" src="/loader.svg" alt="loader" /> : NftData.rawMetadata?.attributes[4]?.value - DiscountValue} </p>
+                  <div className="col text-end flex items-center">
+                    <p>
+                      {IsLoadingDiscount ? (
+                        <img className="w-4 h-4" src="/loader.svg" alt="loader" />
+                      ) : (
+                        NftData.rawMetadata?.attributes[4]?.value - DiscountValue
+                      )}{" "}
+                    </p>
                   </div>
                 </div>
                 {DiscountPercent > 0 && (
@@ -316,43 +324,57 @@ const NftDetails = ({ pdcId }: any) => {
                     <p>{NftPayerUd ? NftPayerUd : "-"}</p>
                   </div>
                 </div>
+                
                 <div className=" w-full flex flex-col items-center md:flex-row justify-center mt-10 text-lg font-bold">
-                  {NftOwner?.toLowerCase() === address?.toLowerCase() && (
-                    <div className="col md:text-start mb-5 mx-2">
-                      <button
-                        onClick={() => handleApprove(NftData.tokenId)}
-                        className="btn btn-wide border-none bg-orange-500 hover:bg-orange-600 text-white font-bold"
-                        disabled={IsApproved}
-                      >
-                        {IsApproving ? <p className='flex'>Approving <img className="w-4 h-4 ml-5" src="/loader.svg" alt="loader" /></p> : IsApproved ? "Approved" : "Approve" } 
-                       
-                      </button>
-                    </div>
-                  )}
-                  {/* {NftOwner?.toLowerCase() !== address?.toLowerCase() && <div className="col md:text-start mb-5 mx-2">
-                      <button onClick={()=>handleApprove(NftData.tokenId)} className="btn btn-wide border-none bg-orange-500 hover:bg-orange-600 text-white font-bold" disabled={IsTokenApproved}>{IsTokenApproved ? 'Token Approved' : 'Approve Token'}</button>
-                    </div>} */}
-
-                  {NftOwner.toLowerCase() !== address?.toLowerCase() && (
-                    <div className="col md:text-start mb-5 mx-2">
-                      <button
-                        onClick={() => setShowModal(true)}
-                        className="btn btn-wide border-none bg-green-500 hover:bg-green-600 text-white font-bold"
-                      >
-                        Buy
-                      </button>
-                    </div>
-                  )}
-                  {NftOwner?.toLowerCase() === address?.toLowerCase() && (
-                    <div className="col md:text-end mb-5 mx-2">
-                      <button
-                        onClick={() => handleSellNft(NftData.tokenId)}
-                        className="btn btn-wide border-none bg-rose-500 hover:bg-rose-600 text-white font-bold"
-                        disabled={!IsApproved}
-                      >
-                        List to Marketplace
-                      </button>
-                    </div>
+                  
+                  {Date.now() < NftData.rawMetadata?.attributes[1]?.value * 1000 ? (
+                    <>{IsListedForSale
+                      ? <>
+                      {NftOwner?.toLowerCase() === address?.toLowerCase() && (
+                        <div className="col md:text-start mb-5 mx-2">
+                          <button
+                            onClick={() => handleApprove(NftData.tokenId)}
+                            className="btn btn-wide border-none bg-orange-500 hover:bg-orange-600 text-white font-bold"
+                            disabled={IsApproved}
+                          >
+                            {IsApproving ? (
+                              <p className="flex">
+                                Approving <img className="w-4 h-4 ml-5" src="/loader.svg" alt="loader" />
+                              </p>
+                            ) : IsApproved ? (
+                              "Approved"
+                            ) : (
+                              "Approve"
+                            )}
+                          </button>
+                        </div>
+                      )}
+                      {NftOwner.toLowerCase() !== address?.toLowerCase() && (
+                        <div className="col md:text-start mb-5 mx-2">
+                          <button
+                            onClick={() => setShowModal(true)}
+                            className="btn btn-wide border-none bg-green-500 hover:bg-green-600 text-white font-bold"
+                          >
+                            Buy
+                          </button>
+                        </div>
+                      )}
+                      {NftOwner?.toLowerCase() === address?.toLowerCase() && (
+                        <div className="col md:text-end mb-5 mx-2">
+                          <button
+                            onClick={() => handleSellNft(NftData.tokenId)}
+                            className="btn btn-wide border-none bg-rose-500 hover:bg-rose-600 text-white font-bold"
+                            disabled={!IsApproved}
+                          >
+                            List to Marketplace
+                          </button>
+                        </div>
+                      )}
+                      
+                      </> : 'Not Listed For Sale'}
+                    </>
+                  ) : (
+                    <p className='text-rose-500'>Expired PDC</p>
                   )}
                 </div>
               </div>

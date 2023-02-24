@@ -12,7 +12,10 @@ import { ethers } from "ethers";
 const ConfirmModal = ({ showModal, setShowModal,tokenId, NftData, NftPayer, NftPayerUd, IsTokenApproved, setIsTokenApproved, Discount , payableAmount, setNftOwner}: any) => {
   const [loading, setLoading] = useState(false);
   const [IsPdc, setIsPdc] = useState(false);
+  const [IsBuyingNft, setIsBuyingNft] = useState(false);
+  const [IsApprovingToken, setIsApprovingToken] = useState(false);
   const [TxHash, setTxHash] = useState("");
+  const [ApprovedTxnHash, setApprovedTxnHash] = useState("");
   
   const shortAddress = (address: string) => {
     return address.slice(0, 6) + "..." + address.slice(-4);
@@ -24,21 +27,26 @@ const ConfirmModal = ({ showModal, setShowModal,tokenId, NftData, NftPayer, NftP
 
   const handleApprove = async () => {
     try {
+      setIsApprovingToken(true);
       const tokenFaucetAddress = process.env.NEXT_PUBLIC_TOKEN_FAUCET_ADDRESS || "";
       const contract = await sdk?.getContract(tokenFaucetAddress, TokenFaucetABI);
       const approveStatusResponse: any = await contract?.call("approve", process.env.NEXT_PUBLIC_PDC_MARKETPLACE, ethers.constants.MaxUint256.toString());
       console.log("approveStatusResponse: ", approveStatusResponse);
       if(approveStatusResponse && approveStatusResponse.receipt){
         setIsTokenApproved(true);
+        setApprovedTxnHash(approveStatusResponse.receipt.transactionHash);
         successAlert('Approved Successfully!');
       }
     } catch (error:any) {
       console.log(error)
-      errorAlert(error.error.message);
+      errorAlert('Approval Failed!');
+    } finally {
+      setIsApprovingToken(false);
     }
   };
   const handleBuyNft = async () => {
     try {
+      setIsBuyingNft(true);
       const pdcNftMarketPlaceAddress = process.env.NEXT_PUBLIC_PDC_MARKETPLACE || "";
       const contract = await sdk?.getContract(pdcNftMarketPlaceAddress, PdcNftMarketplaceABI);
       const txResponse: any = await contract?.call("createMarketSale", parseInt(tokenId), Discount * 100);
@@ -48,10 +56,11 @@ const ConfirmModal = ({ showModal, setShowModal,tokenId, NftData, NftPayer, NftP
         setTxHash(txResponse.receipt)
         setNftOwner();
         handleModalClose();
-
       }
     } catch (error) {
       console.log(error)
+    } finally {
+      setIsBuyingNft(false);
     }
   };
   const handleModalClose = () => {
@@ -114,38 +123,27 @@ const ConfirmModal = ({ showModal, setShowModal,tokenId, NftData, NftPayer, NftP
                     <span className="font-bold">{NftPayerUd ? NftPayerUd : "-"}</span>
                   </div>
                   <br />
-                  <p className="text-center">
+                  {/* <p className="text-center">
                     You acknowledge holding minimum {payableAmount} {NftData.rawMetadata?.attributes[3]?.value} in your Account
-                  </p>
+                  </p> */}
                 </div>
               </div>
               <div className="modal-footer my-5 pt-5 flex justify-center items-center rounded-b-xl border-t-2 border-gray-200">
-                {loading && (
-                  <div className="text-center flex flex-col items-center">
-                    <img src="/loader.svg" alt="loader" />
-                    <p>Creating PDC...</p>
-                  </div>
-                )}
-                {!loading && IsPdc && (
-                  <>
-                    <Link href={process.env.NEXT_PUBLIC_MATIC_EXPLORER + pdcHash}>
-                      <a target="_blank" className="bg-green-500 rounded-xl px-5 py-2 hover:shadow-xl hover:bg-green-700 text-white">
-                        Check your transaction
-                      </a>
-                    </Link>
-                  </>
-                )}
-                { (
-                  <>
                     <button
                       onClick={() => handleApprove()}
                       className={`border border-gray-200 rounded-lg py-2 px-5 m-2 text-white font-bold hover:shadow-xl hover:text-white 
-                      ${
-                        IsTokenApproved ? "bg-gray-500 cursor-not-allowed" : "bg-green-500 hover:bg-green-800"
-                      }`}
+                      ${IsTokenApproved ? "bg-gray-500 cursor-not-allowed" : "bg-green-500 hover:bg-green-800"}`}
                       disabled={IsTokenApproved == true}
                     >
-                      {IsTokenApproved == true ? "Approved" : "Approve"}
+                      {IsApprovingToken ? (
+                        <p className="flex items-center">
+                          Approving <img className="w-4 h-4 ml-5" src="/loader.svg" alt="loader" />{" "}
+                        </p>
+                      ) : IsTokenApproved == true ? (
+                        "Approved"
+                      ) : (
+                        "Approve"
+                      )}
                     </button>
                     <button
                       onClick={() => handleBuyNft()}
@@ -154,7 +152,13 @@ const ConfirmModal = ({ showModal, setShowModal,tokenId, NftData, NftPayer, NftP
                       }`}
                       disabled={IsTokenApproved == false}
                     >
-                      Buy NFT
+                      {IsBuyingNft ? (
+                        <p className="flex items-center">
+                          Buying <img className="w-4 h-4 ml-5" src="/loader.svg" alt="loader" />{" "}
+                        </p>
+                      ) : (
+                        "Buy NFT"
+                      )}
                     </button>
                     <button
                       onClick={() => handleModalClose()}
@@ -162,8 +166,6 @@ const ConfirmModal = ({ showModal, setShowModal,tokenId, NftData, NftPayer, NftP
                     >
                       Cancel
                     </button>
-                  </>
-                )}
               </div>
             </div>
           </div>

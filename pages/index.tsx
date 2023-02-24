@@ -44,6 +44,12 @@ const Marketplace = () => {
     }
   };
 
+  const handleSorting = (event:any) => {
+
+  }
+  const handleFiltering = (event:any) => {
+
+  }
   useEffect(() => {
     getAllNFT();
   }, []);
@@ -160,10 +166,11 @@ const Marketplace = () => {
             </div>
             <div className="flex items-center justify-center">
               <select
-                defaultValue={0}
+                onChange={handleSorting}
+                value={0}
                 className="select border border-purple-600 focus:outline-none select-primary w-1/2 mt-5 md:mt-0 md:max-w-xs ml-5 rounded-xl"
               >
-                <option value={0} disabled selected>
+                <option value={0} disabled>
                   SORT BY
                 </option>
                 <option value={1}>Issued Date</option>
@@ -171,10 +178,11 @@ const Marketplace = () => {
                 <option value={3}>Token Amount</option>
               </select>
               <select
-                defaultValue={0}
+                value={0}
+                onChange={handleFiltering}
                 className="select border border-purple-600 focus:outline-none select-primary w-1/2 mt-5 md:mt-0 md:max-w-xs ml-5 rounded-xl"
               >
-                <option value={0} disabled selected>
+                <option value={0} disabled>
                   Filter
                 </option>
                 <option value={1}>All</option>
