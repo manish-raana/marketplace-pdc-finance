@@ -154,6 +154,9 @@ const NftDetails = ({ pdcId }: any) => {
   
     }
   }
+  const deleteListing = async (tokenId:string){
+    //deleteMarketItem(tokenId)
+  }
   const getNftListingStatus = async (tokenId:string, nftResponse:any) => {
     try {
       setIsLoadingDiscount(true);
