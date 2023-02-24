@@ -29,8 +29,6 @@ const NftDetails = ({ pdcId }: any) => {
   const [IsLoadingDiscount, setIsLoadingDiscount] = useState(true);
   const [IsLoadingNftData, setIsLoadingNftData] = useState(true);
   const [IsTokenApproved, setIsTokenApproved] = useState(false);
-  const [IsListedForSale, setIsListedForSale] = useState(false);
-
   const address = useAddress();
   const settings = {
     apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY, // Replace with your Alchemy API Key.
@@ -165,11 +163,7 @@ const NftDetails = ({ pdcId }: any) => {
       const statusResponse: any = await contract?.call("marketItems", parseInt(tokenId));
       console.log('marketItems: ',statusResponse);
       setDiscountPercent(parseInt((statusResponse?.discountPct).toString()))
-      if(statusResponse?.tokenId.toString() == tokenId && statusResponse?.state == 0){
-        setIsListedForSale(true);
-      }else{
-        setIsListedForSale(false);
-      }
+      
       const calActualAmountResponse = await contract?.call("_calcActualPrice",nftResponse?.rawMetadata?.attributes[4]?.value, parseInt((statusResponse?.discountPct).toString()), nftResponse?.rawMetadata?.attributes[1]?.value);
       //console.log('_calcActualPrice: ',calActualAmountResponse)
       if(calActualAmountResponse && calActualAmountResponse?.discountedAmount){
@@ -328,8 +322,7 @@ const NftDetails = ({ pdcId }: any) => {
                 <div className=" w-full flex flex-col items-center md:flex-row justify-center mt-10 text-lg font-bold">
                   
                   {Date.now() < NftData.rawMetadata?.attributes[1]?.value * 1000 ? (
-                    <>{IsListedForSale
-                      ? <>
+                    <>
                       {NftOwner?.toLowerCase() === address?.toLowerCase() && (
                         <div className="col md:text-start mb-5 mx-2">
                           <button
@@ -370,8 +363,6 @@ const NftDetails = ({ pdcId }: any) => {
                           </button>
                         </div>
                       )}
-                      
-                      </> : 'Not Listed For Sale'}
                     </>
                   ) : (
                     <p className='text-rose-500'>Expired PDC</p>
