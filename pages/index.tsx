@@ -187,13 +187,16 @@ const Marketplace = () => {
                 </option>
                 <option value={1}>All</option>
                 <option value={2}>Owned by You</option>
+                <option value={2}>Available PDCs</option>
+                <option value={2}>Expired PDCs</option>
               </select>
             </div>
           </form>
           <div className="flex flex-wrap -m-4 mt-10">
             {NftList.map((item: any, index: number) => (
               <div className="p-4 lg:w-1/3" key={index}>
-                <Link href={`/pdc/${item?.tokenId}`}>
+                <Link href={`/pdc/${item?.tokenId}`} passHref>
+                  <a className={item?.rawMetadata?.attributes[1].value * 1000 > Date.now() ? '' : 'pointer-events-none'}>
                   <div className="h-full relative cursor-pointer bg-gray-50 p-2 hover:shadow-xl hover:scale-105 transition duration-300 ease-in-out rounded-xl overflow-hidden">
                     
                     <Image src={item.media[0].raw} loading="lazy" width={500} height={250} alt="img" />
@@ -225,6 +228,7 @@ const Marketplace = () => {
                       </Link>
                     </div>
                   </div>
+                  </a>
                 </Link>
               </div>
             ))}
