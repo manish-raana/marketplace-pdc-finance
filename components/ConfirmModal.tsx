@@ -1,72 +1,52 @@
 import React, { useState } from "react";
 import { RxCrossCircled } from "react-icons/rx";
-import { formatDate } from "../utils/web3";
+import { convertDate, formatDate } from "../utils/web3";
 import { useSDK } from "@thirdweb-dev/react";
 import { parseUnits } from "../utils/web3";
 import { successAlert, errorAlert } from "../utils/alerts";
-import pdcContractABI from "../abi/pdc.json";
+import PdcNftMarketplaceABI from "../abi/NFTMarkepPlace.json";
+import TokenFaucetABI from "../abi/tokenFaucetABI.json";
 import Link from "next/link";
+import { ethers } from "ethers";
 
-const ConfirmModal = ({
-  showModal,
-  setShowModal,
-  pdcDate,
-  tokenName,
-  tokenAddress,
-  tokenAmount,
-  receiverAddress,
-  pdcContractAddress,
-  unstoppableDomain
-}: any) => {
+const ConfirmModal = ({ showModal, setShowModal,tokenId, NftData, NftPayer, NftPayerUd, IsTokenApproved, setIsTokenApproved, Discount , payableAmount}: any) => {
   const [loading, setLoading] = useState(false);
   const [IsPdc, setIsPdc] = useState(false);
   const [pdcHash, setPdcHash] = useState("");
-
   const shortAddress = (address: string) => {
     return address.slice(0, 6) + "..." + address.slice(-4);
   };
   const handleToolTipText = (data: string) => {
-    return (
-      data.slice(0, data.length / 2) +
-      " " +
-      data.slice(data.length / 2, data.length)
-    );
+    return data.slice(0, data.length / 2) + " " + data.slice(data.length / 2, data.length);
   };
   const sdk = useSDK();
-  const CreatePdc = async () => {
-    const dateTime = Math.floor(new Date(pdcDate).getTime());
-    if (dateTime <= Date.now()) {
-      errorAlert("Please select a valid future date!");
-      handleModalClose();
-      return;
-    }
 
+  const handleApprove = async () => {
     try {
-      setLoading(true);
-      const dateTime = Math.floor(new Date(pdcDate).getTime() / 1000);
-      const contract = await sdk?.getContract(
-        pdcContractAddress,
-        pdcContractABI
-      );
-      const tx = await contract?.call(
-        "createPDC",
-        tokenAddress,
-        receiverAddress,
-        parseUnits(tokenAmount),
-        dateTime
-      );
-      console.log(tx);
-      if (tx && tx.receipt) {
-        console.log(tx);
-        setLoading(false);
-        setIsPdc(true);
-        setPdcHash(tx.receipt.transactionHash);
-        successAlert("PDC created successfully");
+      const tokenFaucetAddress = process.env.NEXT_PUBLIC_TOKEN_FAUCET_ADDRESS || "";
+      const contract = await sdk?.getContract(tokenFaucetAddress, TokenFaucetABI);
+      const approveStatusResponse: any = await contract?.call("approve", process.env.NEXT_PUBLIC_PDC_MARKETPLACE, ethers.constants.MaxUint256.toString());
+      console.log("approveStatusResponse: ", approveStatusResponse);
+      if(approveStatusResponse && approveStatusResponse.receipt){
+        setIsTokenApproved(true);
+        successAlert('Approved Successfully!');
+      }
+    } catch (error:any) {
+      console.log(error)
+      errorAlert(error.error.message);
+    }
+  };
+  const handleBuyNft = async () => {
+    try {
+      const pdcNftMarketPlaceAddress = process.env.NEXT_PUBLIC_PDC_MARKETPLACE || "";
+      const contract = await sdk?.getContract(pdcNftMarketPlaceAddress, PdcNftMarketplaceABI);
+      const txResponse: any = await contract?.call("createMarketSale", parseInt(tokenId), Discount * 100);
+      //console.log(txResponse);
+      if (txResponse && txResponse.receipt) { 
+        successAlert('You bought NFT Successfully!');
       }
     } catch (error) {
-      console.log(error);
-      setLoading(false);
-      setIsPdc(false);
+      console.log(error)
     }
   };
   const handleModalClose = () => {
@@ -82,11 +62,7 @@ const ConfirmModal = ({
           <div className="w-full flex justify-center items-center h-screen md:h-auto">
             <div className="w-full bg-white flex flex-col rounded-2xl bg-opacity-100 md:w-1/2 h-84">
               <div className="flex items-center text-center justify-between mx-2">
-                <p className="text-center flex-grow font-bold text-2xl mt-3">
-                  {IsPdc
-                    ? "PDC Created Successfully!"
-                    : "Please confirm the below details"}
-                </p>
+                <p className="text-center flex-grow font-bold text-2xl mt-3">Please Confirm the below details</p>
 
                 <RxCrossCircled
                   onClick={() => {
@@ -96,36 +72,45 @@ const ConfirmModal = ({
                 />
               </div>
               <div className="modal-body my-5 grow text-start md:text-center flex flex-col items-center justify-center">
-                <div className="text-start md:text-center px-2 md:px-0">
-                  You are making a post-dated crypto payment for
+                <div className="w-11/12 text-start md:text-center px-10 md:px-0">
+                  You are buying a post-dated NFT for
                   <div className="flex justify-between mt-2 px-5 md:px-0">
                     <span className="font-bold">Token Name: </span>
-                    <span className="font-bold">{tokenName}</span>
+                    <span className="font-bold">{NftData.rawMetadata?.attributes[3]?.value}</span>
                   </div>
                   <div className="flex justify-between px-5 md:px-0">
-                    <span className="font-bold">Amount: </span>
-                    <span className="font-bold">
-                      {tokenAmount.toLocaleString()}
-                    </span>
+                    <span className="font-bold">Token Amount: </span>
+                    <span className="font-bold">{NftData.rawMetadata?.attributes[4]?.value}</span>
                   </div>
                   <div className="flex justify-between px-5 md:px-0">
-                    <span className="font-bold">Receiver: </span>
-                    <span
-                      className="font-bold tooltip"
-                      data-tip={handleToolTipText(receiverAddress)}
-                    >
-                      {unstoppableDomain  !== '' ? unstoppableDomain : shortAddress(receiverAddress)}
-                    </span>
+                    <span className="font-bold">Payable Amount: </span>
+                    <span className="font-bold">{payableAmount}</span>
+                  </div>
+                  <div className="flex justify-between px-5 md:px-0">
+                    <span className="font-bold">Discount: </span>
+                    <span className="font-bold">{Discount} % p.a.</span>
+                  </div>
+                  <div className="flex justify-between px-5 md:px-0">
+                    <span className="font-bold">Platform Fee: </span>
+                    <span className="font-bold">0.5 % </span>
                   </div>
                   <div className="flex justify-between px-5 md:px-0">
                     <span className="font-bold">Payment Date: </span>
-                    <span className="font-bold">{formatDate(pdcDate)}</span>
+                    <span className="font-bold">{convertDate(NftData.rawMetadata?.attributes[1]?.value * 1000)}</span>
+                  </div>
+                  <div className="flex justify-between px-5 md:px-0">
+                    <span className="font-bold">Payer: </span>
+                    <span className="font-bold tooltip" data-tip={handleToolTipText(NftPayer)}>
+                      {shortAddress(NftPayer)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between px-5 md:px-0">
+                    <span className="font-bold">Payer UD: </span>
+                    <span className="font-bold">{NftPayerUd ? NftPayerUd : "-"}</span>
                   </div>
                   <br />
                   <p className="text-center">
-                    You acknowledge funding your PDC Account{" "}
-                    <b>{shortAddress(pdcContractAddress)}</b> <br /> latest
-                    before the <b>{formatDate(pdcDate)}</b>.
+                    You acknowledge holding minimum {payableAmount} {NftData.rawMetadata?.attributes[3]?.value} in your Account
                   </p>
                 </div>
               </div>
@@ -138,25 +123,33 @@ const ConfirmModal = ({
                 )}
                 {!loading && IsPdc && (
                   <>
-                    <Link
-                      href={process.env.NEXT_PUBLIC_MATIC_EXPLORER + pdcHash}
-                    >
-                      <a
-                        target="_blank"
-                        className="bg-green-500 rounded-xl px-5 py-2 hover:shadow-xl hover:bg-green-700 text-white"
-                      >
+                    <Link href={process.env.NEXT_PUBLIC_MATIC_EXPLORER + pdcHash}>
+                      <a target="_blank" className="bg-green-500 rounded-xl px-5 py-2 hover:shadow-xl hover:bg-green-700 text-white">
                         Check your transaction
                       </a>
                     </Link>
                   </>
                 )}
-                {!loading && !IsPdc && (
+                { (
                   <>
                     <button
-                      onClick={() => CreatePdc()}
-                      className={`border border-gray-200 rounded-lg py-2 px-5 m-2 bg-dark-purple hover:bg-purple-800 text-white font-bold hover:shadow-xl hover:text-white`}
+                      onClick={() => handleApprove()}
+                      className={`border border-gray-200 rounded-lg py-2 px-5 m-2 text-white font-bold hover:shadow-xl hover:text-white 
+                      ${
+                        IsTokenApproved ? "bg-gray-500 cursor-not-allowed" : "bg-green-500 hover:bg-green-800"
+                      }`}
+                      disabled={IsTokenApproved == true}
                     >
-                      Create PDC
+                      {IsTokenApproved == true ? "Approved" : "Approve"}
+                    </button>
+                    <button
+                      onClick={() => handleBuyNft()}
+                      className={`border border-gray-200 rounded-lg py-2 px-5 m-2 text-white font-bold hover:shadow-xl hover:text-white ${
+                        !IsTokenApproved ? "bg-gray-500 cursor-not-allowed" : "bg-dark-purple hover:bg-purple-800"
+                      }`}
+                      disabled={IsTokenApproved == false}
+                    >
+                      Buy NFT
                     </button>
                     <button
                       onClick={() => handleModalClose()}

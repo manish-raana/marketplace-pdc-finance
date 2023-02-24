@@ -22,7 +22,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     process.env.NEXT_PUBLIC_MORALIS_TESTNET_API_SERVER_URL || "";
   const moralis_app_id = process.env.NEXT_PUBLIC_MORALIS_TESTNET_APP_ID || "";
   return (
-    <ThirdwebProvider desiredChainId={activeChainId}>
+    <ThirdwebProvider activeChain={activeChainId}>
       <AppContext.Provider
         value={{
           state: {

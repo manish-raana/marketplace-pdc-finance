@@ -4,7 +4,9 @@ import Link from "next/link";
 import { useContext, useEffect, useState } from "react";
 import AppContext from "../context/AppConnext";
 import Head from 'next/head'
-import Spline from "@splinetool/react-spline";
+import Countdown from "react-countdown";
+
+import { formatDate } from '../utils/web3'
 
 const Marketplace = () => {
   const [NftList, setNftList] = useState<Array<any>>([]);
@@ -13,11 +15,11 @@ const Marketplace = () => {
 
   const getAllNFT = async () => {
     if (GlobalStates.state.NftList.length > 0) {
-      console.log("getting from cached....");
+      //console.log("getting from cached....");
       setNftList(GlobalStates.state.NftList);
       return;
     }
-    console.log("getting from api....");
+    //console.log("getting from api....");
     const settings = {
       apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY, // Replace with your Alchemy API Key.
       network: Network.MATIC_MUMBAI, // Replace with your network.
@@ -29,7 +31,7 @@ const Marketplace = () => {
         process.env.NEXT_PUBLIC_PDC_NFT_CONTRACT_ADDRESS || "";
       const nftResponse = await alchemy.nft.getNftsForContract(pdc_nft_address);
       if (nftResponse && nftResponse.nfts && nftResponse.nfts.length > 0) {
-        console.log(nftResponse);
+        //console.log(nftResponse);
         const nfts = [
           ...nftResponse.nfts,
           ...nftResponse.nfts,
@@ -164,20 +166,26 @@ const Marketplace = () => {
               </span>
             </div>
             <div className="flex items-center justify-center">
-              <select className="select border border-purple-600 focus:outline-none select-primary w-1/2 mt-5 md:mt-0 md:max-w-xs ml-5 rounded-xl">
-                <option disabled selected>
+              <select
+                defaultValue={0}
+                className="select border border-purple-600 focus:outline-none select-primary w-1/2 mt-5 md:mt-0 md:max-w-xs ml-5 rounded-xl"
+              >
+                <option value={0} disabled selected>
                   SORT BY
                 </option>
-                <option>Issued Date</option>
-                <option>Payment Date</option>
-                <option>Token Amount</option>
+                <option value={1}>Issued Date</option>
+                <option value={2}>Payment Date</option>
+                <option value={3}>Token Amount</option>
               </select>
-              <select className="select border border-purple-600 focus:outline-none select-primary w-1/2 mt-5 md:mt-0 md:max-w-xs ml-5 rounded-xl">
-                <option disabled selected>
+              <select
+                defaultValue={0}
+                className="select border border-purple-600 focus:outline-none select-primary w-1/2 mt-5 md:mt-0 md:max-w-xs ml-5 rounded-xl"
+              >
+                <option value={0} disabled selected>
                   Filter
                 </option>
-                <option>All</option>
-                <option>Owned by You</option>
+                <option value={1}>All</option>
+                <option value={2}>Owned by You</option>
               </select>
             </div>
           </form>
@@ -188,7 +196,10 @@ const Marketplace = () => {
                   <div className="h-full cursor-pointer bg-gray-50 p-2 hover:shadow-xl hover:scale-105 transition duration-300 ease-in-out rounded-xl overflow-hidden relative">
                     <Image src={item.media[0].raw} loading="lazy" width={500} height={250} alt="img" />
                     <div className="flex items-center justify-between">
-                      <p className="mb-2 font-bold text-start">{item.title}</p>
+                      <p className="mb-2 font-bold text-start">
+                        {item.title} - {item.tokenId}
+                      </p>
+                      <Countdown date={item?.rawMetadata?.attributes[1].value * 1000} />
                       <Link
                         href={"https://testnets.opensea.io/assets/mumbai/" + process.env.NEXT_PUBLIC_PDC_NFT_CONTRACT_ADDRESS + "/" + item?.tokenId}
                       >
