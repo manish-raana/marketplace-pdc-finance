@@ -183,7 +183,7 @@ const Marketplace = () => {
             {NftList.map((item: any, index: number) => (
               <div className="p-4 lg:w-1/3" key={index}>
                 <Link href={`/pdc/${item?.tokenId}`} passHref>
-                  <a className={item?.rawMetadata?.attributes[1].value * 1000 > Date.now() ? '' : 'pointer-events-none'}>
+                  <div className={item?.rawMetadata?.attributes[1].value * 1000 > Date.now() ? '' : 'pointer-events-none'}>
                   <div className="h-full relative cursor-pointer bg-gray-50 p-2 hover:shadow-xl hover:scale-105 transition duration-300 ease-in-out rounded-xl overflow-hidden">
                     
                     <Image src={item.media[0].raw} loading="lazy" width={500} height={250} alt="img" />
@@ -215,7 +215,7 @@ const Marketplace = () => {
                       </Link>
                     </div>
                   </div>
-                  </a>
+                  </div>
                 </Link>
               </div>
             ))}

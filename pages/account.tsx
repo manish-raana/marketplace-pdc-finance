@@ -5,10 +5,16 @@ import { Alchemy, Network } from 'alchemy-sdk';
 import Link from 'next/link';
 import Image from 'next/image';
 import { CountDownTimer } from '../components';
+import { useRouter } from 'next/router'
+import { debounce } from "lodash";
+
 const Account = () => {
     const address = useAddress();
     const [NftList, setNftList] = useState<Array<any>>([]);
-
+    const [FilteredNftList, setFilteredNftList] = useState<Array<any>>([]);
+    const [filterId, setFilterId] = useState(0);
+    const [sortId, setSortId] = useState(0);
+    const router = useRouter()
     const settings = {
     apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY, // Replace with your Alchemy API Key.
     network: Network.MATIC_MUMBAI, // Replace with your network.
@@ -57,9 +63,9 @@ const Account = () => {
         
         //console.log("owner-nfts:  ", nftResponse);
         const userNfts = userNftList.filter((item: any) => {
-          console.log("user-nft-address:  ", item.contract.address);
+          //console.log("user-nft-address:  ", item.contract.address);
           const isNft = allNfts.find((nft: any) => nft.contract.address === item.contract.address);
-          console.log("isNft: ", isNft);
+          //console.log("isNft: ", isNft);
           if (isNft) {
             return item;
           } else {
@@ -67,6 +73,8 @@ const Account = () => {
           }
         });
       setNftList(userNfts);
+      console.log("userNfts: ", userNfts);
+      setFilteredNftList(userNfts);
       GlobalStates.setUserNftList(userNfts);
       
     } catch (error) {
@@ -75,7 +83,68 @@ const Account = () => {
       GlobalStates.setIsLoading(false);
     }
   }
+  const handleSearch = (keywords: any) => {
+    if (keywords == '') { 
+      setFilteredNftList(NftList);
+    }
+    const results = NftList.filter((nft) => {
+      // assume 'name' property in each list is the keyword we want to search for
+      const address = nft.rawMetadata?.attributes[2].value.toLowerCase();
+      return address.includes(keywords.toLowerCase());
+    });
+    
+    setFilteredNftList(results);
+  };
+  const debouncedSearch = debounce(handleSearch, 500);
+  const handleSearchInput = (event:any) => {
+    const keywords = event.target.value;
+    const results = debouncedSearch(keywords);
+    setFilteredNftList(results || []);
+    // do something with the search results, such as updating state or rendering them
+  };
+  const handleSort = (event:any) => {
+    //console.log(event.target.value)
+    setSortId(event.target.value);
+    if (event.target.value == 1) {
+      const sortedList = NftList.sort((a, b) => b.rawMetadata?.attributes[0]?.value - a.rawMetadata?.attributes[0]?.value);
+      //console.log('sorted-list: ',sortedList);
+      setFilteredNftList(sortedList);
+     }
+    if (event.target.value == 2) {
+      const sortedList = NftList.sort((a, b) => b.rawMetadata?.attributes[1]?.value - a.rawMetadata?.attributes[1]?.value);
+      //console.log("sorted-list: ", sortedList);
+      setFilteredNftList(sortedList);
+     }
+    if (event.target.value == 3) {
+        const sortedList = NftList.sort((a, b) => b.rawMetadata?.attributes[4]?.value - a.rawMetadata?.attributes[4]?.value);
+        //console.log("sorted-list: ", sortedList);
+        setFilteredNftList(sortedList);
+     }
+    if (event.target.value == 4) { 
+      const sortedList = NftList.sort((a, b) => a.rawMetadata?.attributes[4]?.value - b.rawMetadata?.attributes[4]?.value);
+      //console.log("sorted-list: ", sortedList);
+      setFilteredNftList(sortedList);
+    }
+  }
+  const handleFilter = (event: any) => {
+    setFilterId(event.target.value);
+    //console.log(event.target.value);
+    if (event.target.value == 1) {
+      setFilteredNftList(NftList);
+     }
+    if (event.target.value == 2) {
+      // filter listed nfts only
+     }
+    if (event.target.value == 3) {
+      const filteredNft = NftList.filter((item) => item?.rawMetadata?.attributes[1].value * 1000 < Date.now());
+      //console.log("expired-nfts: ", filteredNft);
+      setFilteredNftList(filteredNft);
+     }
+  }
     useEffect(() => {
+      if(!address){
+        router.push('/')
+      }
       getAllNFT();
     }, [address]);
   return (
@@ -91,8 +160,9 @@ const Account = () => {
         <div className="flex flex-grow md:w-[50vw]">
           <input
             type="search"
+            onChange={handleSearchInput}
             className="w-full rounded-xl border border-purple-600 py-2 px-2 pl-10 text-lg text-purple-600 placeholder-jacarta-300 focus:outline-none"
-            placeholder="Search NFT by address or tokenId"
+            placeholder="Search NFT by payer address"
           />
           <span className="absolute left-2 top-3.5 md:top-0 flex md:h-full w-12 items-center justify-center rounded-2xl">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" className="h-4 w-4 fill-purple-600">
@@ -102,33 +172,39 @@ const Account = () => {
           </span>
         </div>
         <div className="flex w-full md:w-auto items-center md:-ml-2">
-          <select value={0} className="select w-full border border-purple-600 focus:outline-none select-primary mt-5 md:mt-0 md:ml-5 rounded-xl">
+          <select
+            value={sortId}
+            onChange={handleSort}
+            className="select w-full border border-purple-600 focus:outline-none select-primary mt-5 md:mt-0 md:ml-5 rounded-xl"
+          >
             <option value={0} disabled>
               SORT BY
             </option>
             <option value={1}>Issued Date</option>
             <option value={2}>Payment Date</option>
-            <option value={3}>Token Amount</option>
+            <option value={3}>Token Amount (High-Low)</option>
+            <option value={4}>Token Amount (Low-High)</option>
           </select>
         </div>
         <div className="flex w-full md:w-auto items-center md:ml-2">
-          <select value={0} className="select w-full border border-purple-600 focus:outline-none select-primary mt-5 md:mt-0 md:ml-5 rounded-xl">
-            <option value={0} disabled>
-              All NFTs
-            </option>
-            <option value={3}>Available</option>
-            <option value={1}>Listed</option>
-            <option value={2}>Expired</option>
+          <select
+            value={filterId}
+            onChange={handleFilter}
+            className="select w-full border border-purple-600 focus:outline-none select-primary mt-5 md:mt-0 md:ml-5 rounded-xl"
+          >
+            <option value={1}>All NFTs</option>
+            <option value={2}>Listed</option>
+            <option value={3}>Expired</option>
           </select>
         </div>
       </form>
 
       {/* list of nfts */}
       <div className="flex flex-wrap -m-4 mt-10">
-        {NftList.map((item: any, index: number) => (
+        {FilteredNftList.map((item: any, index: number) => (
           <div className="p-4 lg:w-1/3" key={index}>
             <Link href={`/pdc/${item?.tokenId}`} passHref>
-              <a className={item?.rawMetadata?.attributes[1].value * 1000 > Date.now() ? "" : "pointer-events-none"}>
+              <div className={item?.rawMetadata?.attributes[1].value * 1000 > Date.now() ? "" : "pointer-events-none"}>
                 <div className="h-full relative cursor-pointer bg-gray-50 p-2 hover:shadow-xl hover:scale-105 transition duration-300 ease-in-out rounded-xl overflow-hidden">
                   <Image src={item.media[0].raw} loading="lazy" width={500} height={250} alt="img" />
                   <div className="absolute top-8 right-3">
@@ -159,7 +235,7 @@ const Account = () => {
                     </Link>
                   </div>
                 </div>
-              </a>
+              </div>
             </Link>
           </div>
         ))}
