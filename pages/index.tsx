@@ -155,25 +155,17 @@ const Marketplace = () => {
 
             {/* <!-- Hero image --> */}
             <div className="col-span-5 md:col-span-6 xl:col-span-8">
-              <div className="relative group text-center pl-8 md:text-right">
-                <div className="mt-12 md:w-2/3 float-right transition duration-500 ease-in-out group-hover:shadow-3xl group-hover:backdrop-blur group-hover:rotate-[0deg] rotate-[8deg]">
-                  <Image
+              <div className="relative group text-center md:pl-8 md:text-right">
+                <img
                   src="/pdc.webp"
                   alt=""
-                  width={450}
-                  height={230}
-                  priority
+                  className="mt-12 md:w-2/3 float-right transition duration-500 ease-in-out group-hover:shadow-3xl group-hover:backdrop-blur group-hover:rotate-[0deg] rotate-[8deg]"
                 />
-                </div>
-                <div className="absolute md:-top-20 animate-fly md:-right-[10%] duration-500 ease-in-out group-hover:rotate-[8deg]">
-                <Image
+                <img
                   src="/3D_elements.webp"
                   alt=""
-                  width={650}
-                  height={480}
-                  priority
+                  className="absolute -top-20 animate-fly md:-right-[10%] duration-500 ease-in-out group-hover:rotate-[8deg]"
                 />
-                </div>
               </div>
             </div>
           </div>
