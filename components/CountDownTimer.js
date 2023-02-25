@@ -33,7 +33,7 @@ export default function CountDownTimer({endTime, fontSize, size}) {
   const daysDuration = days * daySeconds;
 
   return (
-    <div className={`coutndown text-[${fontSize}px]`}>
+    <div className={`coutndown ${fontSize}`}>
       <CountdownCircleTimer {...timerProps} colors="#7E2E84" duration={daysDuration} initialRemainingTime={remainingTime}>
         {({ elapsedTime, color }) => <span style={{ color }}>{renderTime("days", getTimeDays(daysDuration - elapsedTime))}</span>}
       </CountdownCircleTimer>

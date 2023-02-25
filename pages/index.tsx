@@ -235,7 +235,7 @@ const Marketplace = () => {
                     <div className="h-full relative cursor-pointer bg-gray-50 p-2 hover:shadow-xl hover:scale-105 transition duration-300 ease-in-out rounded-xl overflow-hidden">
                       <Image src={item.media[0].raw} loading="lazy" width={500} height={250} alt="img" />
                       <div className="absolute top-8 right-3">
-                          <CountDownTimer endTime={item?.rawMetadata?.attributes[1].value} fontSize={'10'} size={35}/>
+                          <CountDownTimer endTime={item?.rawMetadata?.attributes[1].value} fontSize={'text-[10px]'} size={35}/>
                       </div>
                       <div className="flex items-center justify-between">
                         <p className="mb-2 font-bold text-start">
