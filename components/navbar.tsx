@@ -7,6 +7,9 @@ import {
   useNetwork,
   ChainId,
 } from "@thirdweb-dev/react";
+import { FaUserAlt } from 'react-icons/fa';
+import { useRouter } from "next/router";
+import { errorAlert } from "../utils/alerts";
 
 const NavBar = () => {
   //console.log("isConnected: ", isConnected);
@@ -16,6 +19,16 @@ const NavBar = () => {
   const address = useAddress(); // Get connected wallet address
   const isMismatched = useNetworkMismatch(); // Detect if user is connected to the wrong network
 
+  const router = useRouter();
+
+  const handleAccountNavigate = () => {
+    if(!address){
+      errorAlert('Please connect your wallet!');
+      return;
+    }else{
+      router.push("/account");
+    }
+  }
   useEffect(() => {
     // Check if the user is connected to the wrong network
     console.log(address);
@@ -23,6 +36,9 @@ const NavBar = () => {
       setIsMisMatched(true);
     } else {
       setIsMisMatched(false);
+    }
+    if (!address) {
+      //router.push("/");
     }
   }, [address, isMismatched]); // This above block gets run every time "address" changes (e.g. when the user connects)
 
@@ -43,10 +59,10 @@ const NavBar = () => {
               </svg>
             </label>
           </div>
-          <a href="https://pdc.finance/" className="btn btn-ghost normal-case text-xl md:block hidden">
+          <a href="/" className="btn btn-ghost normal-case text-xl md:block hidden">
             <Image src="/logo_transparent.png" height={38} width={200} alt="pdc finance" />
           </a>
-          <a href="https://pdc.finance/" className="btn btn-ghost flex items-center normal-case text-xl md:hidden">
+          <a href="/" className="btn btn-ghost flex items-center normal-case text-xl md:hidden">
             <Image src="/logo_transparent.png" height={24} width={80} alt="pdc finance" />
           </a>
         </div>
@@ -66,6 +82,9 @@ const NavBar = () => {
               Switch to Mumbai Testnet
             </a>
           )}
+        
+            <FaUserAlt onClick={handleAccountNavigate} className="text-5xl mr-5 text-white bg-dark-purple p-1 rounded-full cursor-pointer"/>
+         
           <ConnectWallet accentColor="#2C095B" colorMode="dark" />
         </div>
       </div>

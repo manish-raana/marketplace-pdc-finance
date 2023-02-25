@@ -14,6 +14,8 @@ import TokenFaucetABI from "../abi/tokenFaucetABI.json";
 import {formatDate,convertDate, hexToEth} from '../utils/web3'
 import { successAlert } from "../utils/alerts";
 import ConfirmModal from "./ConfirmModal";
+import { useRouter } from 'next/router'
+
 
 const NftDetails = ({ pdcId }: any) => {
   const GlobalState = useContext(AppContext);
@@ -30,6 +32,8 @@ const NftDetails = ({ pdcId }: any) => {
   const [IsLoadingNftData, setIsLoadingNftData] = useState(true);
   const [IsTokenApproved, setIsTokenApproved] = useState(false);
   const address = useAddress();
+  const router = useRouter()
+
   const settings = {
     apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY, // Replace with your Alchemy API Key.
     network: Network.MATIC_MUMBAI, // Replace with your network.
@@ -232,11 +236,11 @@ const NftDetails = ({ pdcId }: any) => {
       <div className="w-full scrollbar-hide h-screen overflow-scroll flex flex-col my-10 py-10 md:p-10 items-center">
         <div className="flex justify-between w-full md:w-2/3 items-center px-5 md:px-10">
           <div className="font-bold text-2xl">PDC Info</div>
-          <Link href={"/"}>
-            <p className="flex items-center cursor-pointer text-lg font-bold">
+          
+            <p onClick={() => router.back()} className="flex items-center cursor-pointer text-lg font-bold">
               <MdArrowBackIosNew /> Back
             </p>
-          </Link>
+          
         </div>
         <div className="md:flex flex-col items-center mt-5 mb-10">
           {NftData && (

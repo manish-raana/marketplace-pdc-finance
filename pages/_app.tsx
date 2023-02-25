@@ -18,6 +18,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   const [IsPdcContract, setIsPdcContract] = useState(false);
   const [PdcContractAddress, setPdcContractAddress] = useState("");
   const [NftList, setNftList] = useState([]);
+  const [UserNftList, setUserNftList] = useState([]);
   const moralis_server_url =
     process.env.NEXT_PUBLIC_MORALIS_TESTNET_API_SERVER_URL || "";
   const moralis_app_id = process.env.NEXT_PUBLIC_MORALIS_TESTNET_APP_ID || "";
@@ -32,6 +33,7 @@ function MyApp({ Component, pageProps }: AppProps) {
             pdcMaticBalance: pdcMaticBalance,
             IsLoading: IsLoading,
             NftList: NftList,
+            UserNftList:UserNftList
           },
           setCurrentTab: setCurrentTab,
           setPdcContractAddress: setPdcContractAddress,
@@ -39,6 +41,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           setIsPdcContract: setIsPdcContract,
           setPdcMaticBalance: setPdcMaticBalance,
           setNftList: setNftList,
+          setUserNftList:setUserNftList
         }}
       >
         {IsLoading && <Loading />}

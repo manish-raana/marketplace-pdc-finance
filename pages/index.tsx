@@ -151,7 +151,7 @@ const Marketplace = () => {
 
         <div className="container px-5 py-24 mx-auto w-full">
           <form action="search" className="w-full relative md:flex mb-4">
-            <div className="flex flex-grow mr-5">
+            <div className="flex flex-grow mr-1 w-full">
               <input
                 type="search"
                 className="w-full rounded-xl border border-purple-600 py-2 px-2 pl-10 text-lg text-purple-600 placeholder-jacarta-300 focus:outline-none"
@@ -164,7 +164,7 @@ const Marketplace = () => {
                 </svg>
               </span>
             </div>
-            <div className="flex items-center justify-center">
+            <div className="flex w-full items-center">
               <select
                 onChange={handleSorting}
                 value={0}
