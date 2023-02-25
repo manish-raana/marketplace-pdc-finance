@@ -274,21 +274,21 @@ const Marketplace = () => {
         </div>
       </section>
       {/* <!-- Process / Newsletter --> */}
-      <section class="relative px-5 md:px-24 dark:bg-jacarta-900">
-        <div class="container">
-          <h2 class="mb-16 text-center font-display text-3xl text-jacarta-700">
+      <section className="relative px-5 md:px-24 dark:bg-jacarta-900">
+        <div className="container">
+          <h2 className="mb-16 text-center font-display text-3xl text-jacarta-700">
             Create and sell your NFTs
           </h2>
-          <div class="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4">
-            <div class="text-center">
-              <div class="mb-6 inline-flex rounded-full bg-[#CDBCFF] p-3">
-                <div class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-violet-600">
+          <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4">
+            <div className="text-center">
+              <div className="mb-6 inline-flex rounded-full bg-[#CDBCFF] p-3">
+                <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-violet-600">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
                     width="24"
                     height="24"
-                    class="h-5 w-5 fill-white"
+                    className="h-5 w-5 fill-white"
                   >
                     <path fill="none" d="M0 0h24v24H0z" />
                     <path
@@ -297,42 +297,42 @@ const Marketplace = () => {
                   </svg>
                 </div>
               </div>
-              <h3 class="mb-4 font-display text-lg text-jacarta-700">1. Set up your wallet</h3>
-              <p class="text-jacarta-300">
+              <h3 className="mb-4 font-display text-lg text-jacarta-700">1. Set up your wallet</h3>
+              <p className="text-jacarta-300">
                 Once you've set up your wallet of choice, connect it to OpenSeaby clicking the NFT Marketplacein the top
                 right corner.
               </p>
             </div>
-            <div class="text-center">
-              <div class="mb-6 inline-flex rounded-full bg-[#C4F2E3] p-3">
-                <div class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-green-500">
+            <div className="text-center">
+              <div className="mb-6 inline-flex rounded-full bg-[#C4F2E3] p-3">
+                <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-green-500">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
                     width="24"
                     height="24"
-                    class="h-5 w-5 fill-white"
+                    className="h-5 w-5 fill-white"
                   >
                     <path fill="none" d="M0 0h24v24H0z" />
                     <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" />
                   </svg>
                 </div>
               </div>
-              <h3 class="mb-4 font-display text-lg text-jacarta-700">2. Create Your Collection</h3>
-              <p class="">
+              <h3 className="mb-4 font-display text-lg text-jacarta-700">2. Create Your Collection</h3>
+              <p className="">
                 Click Create and set up your collection. Add social links, a description, profile & banner images, and
                 set a secondary sales fee.
               </p>
             </div>
-            <div class="text-center">
-              <div class="mb-6 inline-flex rounded-full bg-[#CDDFFB] p-3">
-                <div class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-blue-500">
+            <div className="text-center">
+              <div className="mb-6 inline-flex rounded-full bg-[#CDDFFB] p-3">
+                <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-blue-500">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
                     width="24"
                     height="24"
-                    class="h-5 w-5 fill-white"
+                    className="h-5 w-5 fill-white"
                   >
                     <path fill="none" d="M0 0h24v24H0z" />
                     <path
@@ -341,21 +341,21 @@ const Marketplace = () => {
                   </svg>
                 </div>
               </div>
-              <h3 class="mb-4 font-display text-lg text-jacarta-700">3. Add Your NFTs</h3>
-              <p class="">
+              <h3 className="mb-4 font-display text-lg text-jacarta-700">3. Add Your NFTs</h3>
+              <p className="">
                 Upload your work (image, video, audio, or 3D art), add a title and description, and customize your NFTs
                 with properties, stats.
               </p>
             </div>
-            <div class="text-center">
-              <div class="mb-6 inline-flex rounded-full bg-[#FFD0D0] p-3">
-                <div class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-red-500">
+            <div className="text-center">
+              <div className="mb-6 inline-flex rounded-full bg-[#FFD0D0] p-3">
+                <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-red-500">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
                     width="24"
                     height="24"
-                    class="h-5 w-5 fill-white"
+                    className="h-5 w-5 fill-white"
                   >
                     <path fill="none" d="M0 0h24v24H0z" />
                     <path
@@ -364,8 +364,8 @@ const Marketplace = () => {
                   </svg>
                 </div>
               </div>
-              <h3 class="mb-4 font-display text-lg text-jacarta-700 ">4. List Them For Sale</h3>
-              <p class="">
+              <h3 className="mb-4 font-display text-lg text-jacarta-700 ">4. List Them For Sale</h3>
+              <p className="">
                 Choose between auctions, fixed-price listings, and declining-price listings. You choose how you want to
                 sell your NFTs!
               </p>
