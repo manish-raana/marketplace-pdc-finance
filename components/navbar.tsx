@@ -10,6 +10,7 @@ import {
 import { FaUserAlt } from 'react-icons/fa';
 import { useRouter } from "next/router";
 import { errorAlert } from "../utils/alerts";
+import Link from "next/link";
 
 const NavBar = () => {
   //console.log("isConnected: ", isConnected);
@@ -59,12 +60,17 @@ const NavBar = () => {
               </svg>
             </label>
           </div>
-          <a href="/" className="btn btn-ghost normal-case text-xl md:block hidden">
-            <Image src="/logo_transparent.png" height={38} width={200} alt="pdc finance" />
-          </a>
-          <a href="/" className="btn btn-ghost flex items-center normal-case text-xl md:hidden">
-            <Image src="/logo_transparent.png" height={24} width={80} alt="pdc finance" />
-          </a>
+          <Link href="/">
+            <a className="btn btn-ghost normal-case text-xl md:block hidden">
+              <Image src="/logo_transparent.png" height={38} width={200} alt="pdc finance" />
+            </a>
+          </Link>
+
+          <Link href="/">
+            <a className="btn btn-ghost flex items-center normal-case text-xl md:hidden">
+              <Image src="/logo_transparent.png" height={24} width={80} alt="pdc finance" />
+            </a>
+          </Link>
         </div>
         {/* <div className="form-control">
           <input
@@ -82,9 +88,9 @@ const NavBar = () => {
               Switch to Mumbai Testnet
             </a>
           )}
-        
-            <FaUserAlt onClick={handleAccountNavigate} className="text-5xl mr-5 text-white bg-dark-purple p-1 rounded-full cursor-pointer"/>
-         
+
+          <FaUserAlt onClick={handleAccountNavigate} className="text-5xl mr-5 text-white bg-dark-purple p-1 rounded-full cursor-pointer" />
+
           <ConnectWallet accentColor="#2C095B" colorMode="dark" />
         </div>
       </div>

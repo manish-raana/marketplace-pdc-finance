@@ -2,7 +2,7 @@ import React from "react";
 
 const Loading = () => {
   return (
-    <div className="w-full h-screen z-50 absolute inset-0 bg-black opacity-50 flex justify-center items-center pointer-events-none">
+    <div className="w-full min-h-screen z-50 absolute inset-0 bg-black opacity-50 flex justify-center items-center pointer-events-none">
       <div className="opacity-100">
         <svg
           width="58"

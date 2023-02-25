@@ -4,23 +4,16 @@ import Link from "next/link";
 import { useContext, useEffect, useState } from "react";
 import AppContext from "../context/AppConnext";
 import Head from 'next/head'
-import Countdown from "react-countdown";
-
-import { formatDate } from '../utils/web3'
 import { CountDownTimer } from "../components";
-
+import { debounce } from "lodash";
 const Marketplace = () => {
+  const [sortId, setSortId] = useState(0);
   const [NftList, setNftList] = useState<Array<any>>([]);
+  const [FilteredNftList, setFilteredNftList] = useState<Array<any>>([]);
 
   const GlobalStates = useContext(AppContext);
 
-  const getAllNFT = async () => {
-    if (GlobalStates.state.NftList.length > 0) {
-      //console.log("getting from cached....");
-      setNftList(GlobalStates.state.NftList);
-      return;
-    }
-    //console.log("getting from api....");
+  const fetchNftData = async () => {
     const settings = {
       apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY, // Replace with your Alchemy API Key.
       network: Network.MATIC_MUMBAI, // Replace with your network.
@@ -33,8 +26,9 @@ const Marketplace = () => {
       const nftResponse = await alchemy.nft.getNftsForContract(pdc_nft_address);
       if (nftResponse && nftResponse.nfts && nftResponse.nfts.length > 0) {
         //console.log(nftResponse);
-        
-        setNftList(nftResponse.nfts);
+        const expiredRemoved = nftResponse.nfts.filter((items:any) => items?.rawMetadata?.attributes[1].value * 1000 > Date.now());
+        setNftList(expiredRemoved);
+        setFilteredNftList(expiredRemoved);
         GlobalStates.setNftList(nftResponse.nfts);
       }
     } catch (error) {
@@ -42,14 +36,65 @@ const Marketplace = () => {
     } finally {
       GlobalStates.setIsLoading(false);
     }
+  }
+  const getAllNFT = async () => {
+    if (GlobalStates.state.NftList.length > 0) {
+      console.log("getting from cached....");
+      const expiredRemoved = GlobalStates.state.NftList.filter((items: any) => items?.rawMetadata?.attributes[1].value * 1000 > Date.now());
+      setNftList(expiredRemoved);
+      setFilteredNftList(expiredRemoved);
+      return;
+    }
+    //console.log("getting from api....");
+    fetchNftData();
+    
   };
-
+  const handleRefresh = () => {
+    fetchNftData();
+  }
   const handleSorting = (event:any) => {
-
+    //console.log(event.target.value)
+    setSortId(event.target.value);
+    if (event.target.value == 1) {
+      const sortedList = NftList.sort((a, b) => b.rawMetadata?.attributes[0]?.value - a.rawMetadata?.attributes[0]?.value);
+      //console.log('sorted-list: ',sortedList);
+      setFilteredNftList(sortedList);
+    }
+    if (event.target.value == 2) {
+      const sortedList = NftList.sort((a, b) => b.rawMetadata?.attributes[1]?.value - a.rawMetadata?.attributes[1]?.value);
+      //console.log("sorted-list: ", sortedList);
+      setFilteredNftList(sortedList);
+    }
+    if (event.target.value == 3) {
+      const sortedList = NftList.sort((a, b) => b.rawMetadata?.attributes[4]?.value - a.rawMetadata?.attributes[4]?.value);
+      //console.log("sorted-list: ", sortedList);
+      setFilteredNftList(sortedList);
+    }
+    if (event.target.value == 4) {
+      const sortedList = NftList.sort((a, b) => a.rawMetadata?.attributes[4]?.value - b.rawMetadata?.attributes[4]?.value);
+      //console.log("sorted-list: ", sortedList);
+      setFilteredNftList(sortedList);
+    }
   }
-  const handleFiltering = (event:any) => {
-
-  }
+  const handleSearch = (keywords: any) => {
+    if (keywords == '') { 
+      setFilteredNftList(NftList);
+    }
+    const results = NftList.filter((nft) => {
+      // assume 'name' property in each list is the keyword we want to search for
+      const address = nft.rawMetadata?.attributes[2].value.toLowerCase();
+      return address.includes(keywords.toLowerCase());
+    });
+    
+    setFilteredNftList(results);
+  };
+  const debouncedSearch = debounce(handleSearch, 500);
+  const handleSearchInput = (event:any) => {
+    const keywords = event.target.value;
+    const results = debouncedSearch(keywords);
+    setFilteredNftList(results || []);
+    // do something with the search results, such as updating state or rendering them
+  };
   useEffect(() => {
     getAllNFT();
   }, []);
@@ -109,12 +154,12 @@ const Marketplace = () => {
             </div>
 
             {/* <!-- Hero image --> */}
-            <div className="col-span-6 xl:col-span-8">
+            <div className="col-span-5 md:col-span-6 xl:col-span-8">
               <div className="relative group text-center md:pl-8 md:text-right">
                 <img
                   src="/pdc.webp"
                   alt=""
-                  className="mt-12 w-2/3 float-right transition duration-500 ease-in-out group-hover:shadow-3xl group-hover:backdrop-blur group-hover:rotate-[0deg] rotate-[8deg]"
+                  className="mt-12 md:w-2/3 float-right transition duration-500 ease-in-out group-hover:shadow-3xl group-hover:backdrop-blur group-hover:rotate-[0deg] rotate-[8deg]"
                 />
                 <img
                   src="/3D_elements.webp"
@@ -150,10 +195,11 @@ const Marketplace = () => {
         </div>
 
         <div className="container px-5 py-24 mx-auto w-full">
-          <form action="search" className="w-full relative md:flex mb-4">
+          <div className="w-full relative md:flex mb-4">
             <div className="flex flex-grow mr-1 w-full">
               <input
                 type="search"
+                onChange={handleSearchInput}
                 className="w-full rounded-xl border border-purple-600 py-2 px-2 pl-10 text-lg text-purple-600 placeholder-jacarta-300 focus:outline-none"
                 placeholder="Search by payer address or unstoppable domain"
               />
@@ -164,57 +210,54 @@ const Marketplace = () => {
                 </svg>
               </span>
             </div>
-            <div className="flex w-full items-center">
+            <div className="flex-grow w-full items-center md:max-w-xs md:mr-10">
               <select
                 onChange={handleSorting}
-                value={0}
-                className="select border border-purple-600 focus:outline-none select-primary w-1/2 mt-5 md:mt-0 md:max-w-xs ml-5 rounded-xl"
+                value={sortId}
+                className="select border border-purple-600 focus:outline-none select-primary w-full mt-5 md:mt-0 md:max-w-xs md:ml-5 rounded-xl"
               >
                 <option value={0} disabled>
                   SORT BY
                 </option>
                 <option value={1}>Issued Date</option>
                 <option value={2}>Payment Date</option>
-                <option value={3}>Token Amount</option>
+                <option value={3}>Token Amount (High-Low)</option>
+                <option value={4}>Token Amount (Low-High)</option>
               </select>
             </div>
-          </form>
-          <div className="flex flex-wrap -m-4 mt-10">
-            {NftList.map((item: any, index: number) => (
+            <button onClick = {handleRefresh} className="w-full md:w-auto mt-5 md:mt-0 btn bg-dark-purple text-white hover:bg-white hover:border-dark-purple hover:text-dark-purple">Refresh</button>
+          </div>
+          <div className="flex flex-wrap -m-4 mt-10 min-h-screen">
+            {FilteredNftList.map((item: any, index: number) => (
               <div className="p-4 lg:w-1/3" key={index}>
                 <Link href={`/pdc/${item?.tokenId}`} passHref>
-                  <div className={item?.rawMetadata?.attributes[1].value * 1000 > Date.now() ? '' : 'pointer-events-none'}>
-                  <div className="h-full relative cursor-pointer bg-gray-50 p-2 hover:shadow-xl hover:scale-105 transition duration-300 ease-in-out rounded-xl overflow-hidden">
-                    
-                    <Image src={item.media[0].raw} loading="lazy" width={500} height={250} alt="img" />
-                    <div className="absolute top-8 right-3">
-                      {item?.rawMetadata?.attributes[1].value * 1000 > Date.now() ? (
-                        <CountDownTimer endTime={item?.rawMetadata?.attributes[1].value} />
-                      ) : (
-                        <p className='mr-3 text-rose-500'>Expired</p>
-                      )}
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <p className="mb-2 font-bold text-start">
-                        {item.title} - {item.tokenId}
-                      </p>
-                      {/* <Countdown date={item?.rawMetadata?.attributes[1].value * 1000} /> */}
+                  <div className={item?.rawMetadata?.attributes[1].value * 1000 > Date.now() ? "" : "pointer-events-none"}>
+                    <div className="h-full relative cursor-pointer bg-gray-50 p-2 hover:shadow-xl hover:scale-105 transition duration-300 ease-in-out rounded-xl overflow-hidden">
+                      <Image src={item.media[0].raw} loading="lazy" width={500} height={250} alt="img" />
+                      <div className="absolute top-8 right-3">
+                          <CountDownTimer endTime={item?.rawMetadata?.attributes[1].value} />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <p className="mb-2 font-bold text-start">
+                          {item.title} - {item.tokenId}
+                        </p>
+                        {/* <Countdown date={item?.rawMetadata?.attributes[1].value * 1000} /> */}
 
-                      <Link
-                        href={"https://testnets.opensea.io/assets/mumbai/" + process.env.NEXT_PUBLIC_PDC_NFT_CONTRACT_ADDRESS + "/" + item?.tokenId}
-                      >
-                        <a target="_blank">
-                          <Image
-                            className="cursor-pointer hover:scale-105 ease-in-out duration-300 transition object-cover"
-                            src="/opensea.svg"
-                            height={32}
-                            width={32}
-                            alt="opensea-logo"
-                          />
-                        </a>
-                      </Link>
+                        <Link
+                          href={"https://testnets.opensea.io/assets/mumbai/" + process.env.NEXT_PUBLIC_PDC_NFT_CONTRACT_ADDRESS + "/" + item?.tokenId}
+                        >
+                          <a target="_blank">
+                            <Image
+                              className="cursor-pointer hover:scale-105 ease-in-out duration-300 transition object-cover"
+                              src="/opensea.svg"
+                              height={32}
+                              width={32}
+                              alt="opensea-logo"
+                            />
+                          </a>
+                        </Link>
+                      </div>
                     </div>
-                  </div>
                   </div>
                 </Link>
               </div>
