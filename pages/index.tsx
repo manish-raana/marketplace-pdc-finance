@@ -102,7 +102,7 @@ const Marketplace = () => {
   const getNftDiscounts = async (nftList:any) => {
     //console.log('fetching nft discounts....');
     console.log(nftList)
-    const newListWithDiscount = await Promise.all(nftList.map(async (nft:any, index) => {
+    const newListWithDiscount = await Promise.all(nftList.map(async (nft:any) => {
       const discount = await getNftListingStatus(nft.tokenId); 
       //console.log('discount: ', discount);
       //console.log('index: ', index);
