@@ -15,7 +15,7 @@ const PdcDetail = () => {
   }, [router]);
   return <>
       <div>{pdcId && <NftDetails pdcId={pdcId} />}</div>
-      <Footer />
+      {/* <Footer /> */}
     </>;
 };
 

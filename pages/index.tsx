@@ -6,13 +6,16 @@ import AppContext from "../context/AppConnext";
 import Head from 'next/head'
 import { CountDownTimer } from "../components";
 import { debounce } from "lodash";
+import { useSDK } from "@thirdweb-dev/react";
+import PdcNftMarketplaceABI from "../abi/NFTMarkepPlace.json";
 const Marketplace = () => {
   const [sortId, setSortId] = useState(0);
+  const [IsLoadingDiscount, setIsLoadingDiscount] = useState(false);
   const [NftList, setNftList] = useState<Array<any>>([]);
   const [FilteredNftList, setFilteredNftList] = useState<Array<any>>([]);
 
   const GlobalStates = useContext(AppContext);
-
+  const sdk = useSDK();
   const fetchNftData = async () => {
     const settings = {
       apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY, // Replace with your Alchemy API Key.
@@ -29,6 +32,7 @@ const Marketplace = () => {
         const expiredRemoved = nftResponse.nfts.filter((items:any) => items?.rawMetadata?.attributes[1].value * 1000 > Date.now());
         setNftList(expiredRemoved);
         setFilteredNftList(expiredRemoved);
+        getNftDiscounts(expiredRemoved);
         GlobalStates.setNftList(nftResponse.nfts);
       }
     } catch (error) {
@@ -43,11 +47,11 @@ const Marketplace = () => {
       const expiredRemoved = GlobalStates.state.NftList.filter((items: any) => items?.rawMetadata?.attributes[1].value * 1000 > Date.now());
       setNftList(expiredRemoved);
       setFilteredNftList(expiredRemoved);
+      getNftDiscounts(expiredRemoved);
       return;
     }
     //console.log("getting from api....");
     fetchNftData();
-    
   };
   const handleRefresh = () => {
     fetchNftData();
@@ -94,6 +98,35 @@ const Marketplace = () => {
     const results = debouncedSearch(keywords);
     setFilteredNftList(results || []);
     // do something with the search results, such as updating state or rendering them
+  };
+  const getNftDiscounts = async (nftList:any) => {
+    //console.log('fetching nft discounts....');
+    console.log(nftList)
+    const newListWithDiscount = await Promise.all(nftList.map(async (nft:any, index) => {
+      const discount = await getNftListingStatus(nft.tokenId); 
+      //console.log('discount: ', discount);
+      //console.log('index: ', index);
+      return {
+        ...nft,
+        discount: parseInt(discount) / 100,
+      };
+    }));
+    console.log(newListWithDiscount);
+    setFilteredNftList(newListWithDiscount);
+  }
+  const getNftListingStatus = async (tokenId: string) => {
+    try {
+      setIsLoadingDiscount(true);
+      const pdcNftMarketPlaceAddress = process.env.NEXT_PUBLIC_PDC_MARKETPLACE || "";
+      const contract = await sdk?.getContract(pdcNftMarketPlaceAddress, PdcNftMarketplaceABI);
+      const statusResponse: any = await contract?.call("marketItems", parseInt(tokenId));
+      console.log("marketItems: ", statusResponse);
+      //console.log("discountPct: ", parseInt((statusResponse?.discountPct).toString()));
+      return (statusResponse?.discountPct).toString();
+    } catch (error) {
+      console.log(error);
+      setIsLoadingDiscount(false);
+    }
   };
   useEffect(() => {
     getAllNFT();
@@ -225,7 +258,12 @@ const Marketplace = () => {
                 <option value={4}>Token Amount (Low-High)</option>
               </select>
             </div>
-            <button onClick = {handleRefresh} className="w-full mt-5 md:mt-0 md:w-36 rounded-xl bg-accent py-3 px-8 text-center font-semibold text-white shadow-accent-volume transition-all hover:brightness-125">Refresh</button>
+            <button
+              onClick={handleRefresh}
+              className="w-full mt-5 md:mt-0 md:w-36 rounded-xl bg-accent py-3 px-8 text-center font-semibold text-white shadow-accent-volume transition-all hover:brightness-125"
+            >
+              Refresh
+            </button>
           </div>
           <div className="flex flex-wrap -m-4 mt-10 min-h-[60vh]">
             {FilteredNftList.map((item: any, index: number) => (
@@ -234,8 +272,20 @@ const Marketplace = () => {
                   <div className={item?.rawMetadata?.attributes[1].value * 1000 > Date.now() ? "" : "pointer-events-none"}>
                     <div className="h-full relative cursor-pointer bg-gray-50 p-2 hover:shadow-xl hover:scale-105 transition duration-300 ease-in-out rounded-xl overflow-hidden">
                       <Image src={item.media[0].raw} loading="lazy" width={500} height={250} alt="img" />
+                      {item.discount > 0 && <div className="absolute top-0 left-32 pt-2">
+                        <div className="bg-yellow-400 text-white w-10 h-10 relative rounded-full">
+                          <span className="absolute top-0 left-0 h-full w-full">
+                            <span className="block w-full h-full absolute top-0 left-0 transform rotate-45 bg-yellow-400"></span>
+                            <span className="block w-full h-full absolute top-0 left-0 transform rotate-90 bg-yellow-400"></span>
+                            <span className="block w-full h-full absolute top-0 left-0 transform -rotate-45 bg-yellow-400"></span>
+                            <span className="block w-full h-full absolute top-0 left-0 transform -rotate-90 bg-yellow-400"></span>
+                            <span className="block w-full h-full absolute top-0 left-0 bg-yellow-400"></span>
+                          </span>
+                          <span className="inline-block relative text-sm leading-tight text-center">{item.discount}% OFF</span>
+                        </div>
+                      </div>}
                       <div className="absolute top-8 right-3">
-                          <CountDownTimer endTime={item?.rawMetadata?.attributes[1].value} fontSize={'text-[10px]'} size={35}/>
+                        <CountDownTimer endTime={item?.rawMetadata?.attributes[1].value} fontSize={"text-[10px]"} size={35} />
                       </div>
                       <div className="flex items-center justify-between">
                         <p className="mb-2 font-bold text-start">
@@ -268,43 +318,26 @@ const Marketplace = () => {
       {/* <!-- Process / Newsletter --> */}
       <section className="relative px-5 md:px-24 dark:bg-jacarta-900">
         <div className="container">
-          <h2 className="mb-16 text-center font-display text-3xl text-jacarta-700">
-            Create and sell your NFTs
-          </h2>
+          <h2 className="mb-16 text-center font-display text-3xl text-jacarta-700">Create and sell your NFTs</h2>
           <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4">
             <div className="text-center">
               <div className="mb-6 inline-flex rounded-full bg-[#CDBCFF] p-3">
                 <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-violet-600">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    width="24"
-                    height="24"
-                    className="h-5 w-5 fill-white"
-                  >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" className="h-5 w-5 fill-white">
                     <path fill="none" d="M0 0h24v24H0z" />
-                    <path
-                      d="M22 6h-7a6 6 0 1 0 0 12h7v2a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h18a1 1 0 0 1 1 1v2zm-7 2h8v8h-8a4 4 0 1 1 0-8zm0 3v2h3v-2h-3z"
-                    />
+                    <path d="M22 6h-7a6 6 0 1 0 0 12h7v2a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h18a1 1 0 0 1 1 1v2zm-7 2h8v8h-8a4 4 0 1 1 0-8zm0 3v2h3v-2h-3z" />
                   </svg>
                 </div>
               </div>
               <h3 className="mb-4 font-display text-lg text-jacarta-700">1. Set up your wallet</h3>
               <p className="text-jacarta-300">
-                Once you've set up your wallet of choice, connect it to OpenSeaby clicking the NFT Marketplacein the top
-                right corner.
+                Once you've set up your wallet of choice, connect it to OpenSeaby clicking the NFT Marketplacein the top right corner.
               </p>
             </div>
             <div className="text-center">
               <div className="mb-6 inline-flex rounded-full bg-[#C4F2E3] p-3">
                 <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-green-500">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    width="24"
-                    height="24"
-                    className="h-5 w-5 fill-white"
-                  >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" className="h-5 w-5 fill-white">
                     <path fill="none" d="M0 0h24v24H0z" />
                     <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" />
                   </svg>
@@ -312,54 +345,35 @@ const Marketplace = () => {
               </div>
               <h3 className="mb-4 font-display text-lg text-jacarta-700">2. Create Your Collection</h3>
               <p className="">
-                Click Create and set up your collection. Add social links, a description, profile & banner images, and
-                set a secondary sales fee.
+                Click Create and set up your collection. Add social links, a description, profile & banner images, and set a secondary sales fee.
               </p>
             </div>
             <div className="text-center">
               <div className="mb-6 inline-flex rounded-full bg-[#CDDFFB] p-3">
                 <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-blue-500">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    width="24"
-                    height="24"
-                    className="h-5 w-5 fill-white"
-                  >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" className="h-5 w-5 fill-white">
                     <path fill="none" d="M0 0h24v24H0z" />
-                    <path
-                      d="M17.409 19c-.776-2.399-2.277-3.885-4.266-5.602A10.954 10.954 0 0 1 20 11V3h1.008c.548 0 .992.445.992.993v16.014a1 1 0 0 1-.992.993H2.992A.993.993 0 0 1 2 20.007V3.993A1 1 0 0 1 2.992 3H6V1h2v4H4v7c5.22 0 9.662 2.462 11.313 7h2.096zM18 1v4h-8V3h6V1h2zm-1.5 9a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"
-                    />
+                    <path d="M17.409 19c-.776-2.399-2.277-3.885-4.266-5.602A10.954 10.954 0 0 1 20 11V3h1.008c.548 0 .992.445.992.993v16.014a1 1 0 0 1-.992.993H2.992A.993.993 0 0 1 2 20.007V3.993A1 1 0 0 1 2.992 3H6V1h2v4H4v7c5.22 0 9.662 2.462 11.313 7h2.096zM18 1v4h-8V3h6V1h2zm-1.5 9a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z" />
                   </svg>
                 </div>
               </div>
               <h3 className="mb-4 font-display text-lg text-jacarta-700">3. Add Your NFTs</h3>
               <p className="">
-                Upload your work (image, video, audio, or 3D art), add a title and description, and customize your NFTs
-                with properties, stats.
+                Upload your work (image, video, audio, or 3D art), add a title and description, and customize your NFTs with properties, stats.
               </p>
             </div>
             <div className="text-center">
               <div className="mb-6 inline-flex rounded-full bg-[#FFD0D0] p-3">
                 <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-red-500">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    width="24"
-                    height="24"
-                    className="h-5 w-5 fill-white"
-                  >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" className="h-5 w-5 fill-white">
                     <path fill="none" d="M0 0h24v24H0z" />
-                    <path
-                      d="M10.9 2.1l9.899 1.415 1.414 9.9-9.192 9.192a1 1 0 0 1-1.414 0l-9.9-9.9a1 1 0 0 1 0-1.414L10.9 2.1zm2.828 8.486a2 2 0 1 0 2.828-2.829 2 2 0 0 0-2.828 2.829z"
-                    />
+                    <path d="M10.9 2.1l9.899 1.415 1.414 9.9-9.192 9.192a1 1 0 0 1-1.414 0l-9.9-9.9a1 1 0 0 1 0-1.414L10.9 2.1zm2.828 8.486a2 2 0 1 0 2.828-2.829 2 2 0 0 0-2.828 2.829z" />
                   </svg>
                 </div>
               </div>
               <h3 className="mb-4 font-display text-lg text-jacarta-700 ">4. List Them For Sale</h3>
               <p className="">
-                Choose between auctions, fixed-price listings, and declining-price listings. You choose how you want to
-                sell your NFTs!
+                Choose between auctions, fixed-price listings, and declining-price listings. You choose how you want to sell your NFTs!
               </p>
             </div>
           </div>
