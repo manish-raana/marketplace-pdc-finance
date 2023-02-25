@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { RxCrossCircled } from "react-icons/rx";
 import { convertDate, formatDate } from "../utils/web3";
-import { useSDK } from "@thirdweb-dev/react";
+import { useSDK, useAddress } from "@thirdweb-dev/react";
 import { parseUnits } from "../utils/web3";
 import { successAlert, errorAlert } from "../utils/alerts";
 import PdcNftMarketplaceABI from "../abi/NFTMarkepPlace.json";
@@ -16,7 +16,7 @@ const ConfirmModal = ({ showModal, setShowModal,tokenId, NftData, NftPayer, NftP
   const [IsApprovingToken, setIsApprovingToken] = useState(false);
   const [TxHash, setTxHash] = useState("");
   const [ApprovedTxnHash, setApprovedTxnHash] = useState("");
-  
+  const address = useAddress();
   const shortAddress = (address: string) => {
     return address.slice(0, 6) + "..." + address.slice(-4);
   };
@@ -54,7 +54,7 @@ const ConfirmModal = ({ showModal, setShowModal,tokenId, NftData, NftPayer, NftP
       if (txResponse && txResponse.receipt) {
         successAlert('You bought NFT Successfully!');
         setTxHash(txResponse.receipt)
-        setNftOwner();
+        setNftOwner(address);
         handleModalClose();
       }
     } catch (error) {

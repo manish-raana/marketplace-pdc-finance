@@ -1,7 +1,7 @@
 import { useAddress, useNetworkMismatch } from "@thirdweb-dev/react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { NftDetails } from "../../components";
+import { NftDetails, Footer } from "../../components";
 
 const PdcDetail = () => {
   const [pdcId, setPdcId] = useState<any>();
@@ -13,7 +13,10 @@ const PdcDetail = () => {
       setPdcId(pdcId);
     }
   }, [router]);
-  return <div>{pdcId && <NftDetails pdcId={pdcId} />}</div>;
+  return <>
+      <div>{pdcId && <NftDetails pdcId={pdcId} />}</div>
+      <Footer />
+    </>;
 };
 
 export default PdcDetail;

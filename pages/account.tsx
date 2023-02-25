@@ -209,7 +209,7 @@ const Account = () => {
                   <Image src={item.media[0].raw} loading="lazy" width={500} height={250} alt="img" />
                   <div className="absolute top-8 right-3">
                     {item?.rawMetadata?.attributes[1].value * 1000 > Date.now() ? (
-                      <CountDownTimer endTime={item?.rawMetadata?.attributes[1].value} />
+                      <CountDownTimer endTime={item?.rawMetadata?.attributes[1].value} fontSize={'10'} size={35}/>
                     ) : (
                       <p className="mr-3 text-rose-500">Expired</p>
                     )}

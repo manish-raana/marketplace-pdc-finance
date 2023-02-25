@@ -5,12 +5,6 @@ const minuteSeconds = 60;
 const hourSeconds = 3600;
 const daySeconds = 86400;
 
-const timerProps = {
-  isPlaying: true,
-  size: 35,
-  strokeWidth: 0,
-};
-
 const renderTime = (dimension, time) => {
   return (
     <div className="time-wrapper">
@@ -25,16 +19,21 @@ const getTimeMinutes = (time) => ((time % hourSeconds) / minuteSeconds) | 0;
 const getTimeHours = (time) => ((time % daySeconds) / hourSeconds) | 0;
 const getTimeDays = (time) => (time / daySeconds) | 0;
 
-export default function CountDownTimer({endTime}) {
+export default function CountDownTimer({endTime, fontSize, size}) {
   const stratTime = Date.now() / 1000; // use UNIX timestamp in seconds
   //const endTime = stratTime + 243248; // use UNIX timestamp in seconds
 
+  const timerProps = {
+    isPlaying: true,
+    size: size,
+    strokeWidth: 0,
+  };
   const remainingTime = endTime - stratTime;
   const days = Math.ceil(remainingTime / daySeconds);
   const daysDuration = days * daySeconds;
 
   return (
-    <div className="coutndown">
+    <div className={`coutndown text-[${fontSize}px]`}>
       <CountdownCircleTimer {...timerProps} colors="#7E2E84" duration={daysDuration} initialRemainingTime={remainingTime}>
         {({ elapsedTime, color }) => <span style={{ color }}>{renderTime("days", getTimeDays(daysDuration - elapsedTime))}</span>}
       </CountdownCircleTimer>

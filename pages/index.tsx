@@ -121,7 +121,7 @@ const Marketplace = () => {
       {/* <!-- Hero --> */}
       <section className="relative pb-10 pt-20 md:pt-32 lg:h-[88vh] md:px-20">
         <picture className="pointer-events-none absolute inset-x-0 top-0 -z-10">
-          <img src="/gradient.jpg" alt="gradient" className="w-full" />
+          <img src="/gradient.webp" alt="gradient" className="w-full" />
         </picture>
 
         <div className="container h-full">
@@ -139,14 +139,14 @@ const Marketplace = () => {
                 <a
                   href="https://app.pdc.finance"
                   target="_blank"
-                  className="w-36 rounded-full bg-accent py-3 px-8 text-center font-semibold text-white shadow-accent-volume transition-all hover:bg-accent-dark"
+                  className="w-36 rounded-full bg-accent py-3 px-8 text-center font-semibold text-white shadow-accent-volume transition-all hover:bg-accent-dark hover:brightness-125"
                 >
                   Create
                 </a>
                 <a
                   href="https://pdc.finance"
                   target="_blank"
-                  className="w-36 rounded-full bg-white py-3 px-8 text-center font-semibold text-accent shadow-white-volume transition-all hover:bg-accent-dark hover:text-white hover:shadow-accent-volume"
+                  className="w-36 rounded-full bg-white py-3 px-8 hover:bg-gray-200 text-center font-semibold text-accent shadow-white-volume transition-all hover:shadow-accent-volume"
                 >
                   Explore
                 </a>
@@ -155,17 +155,25 @@ const Marketplace = () => {
 
             {/* <!-- Hero image --> */}
             <div className="col-span-5 md:col-span-6 xl:col-span-8">
-              <div className="relative group text-center md:pl-8 md:text-right">
-                <img
+              <div className="relative group text-center pl-8 md:text-right">
+                <div className="mt-12 md:w-2/3 float-right transition duration-500 ease-in-out group-hover:shadow-3xl group-hover:backdrop-blur group-hover:rotate-[0deg] rotate-[8deg]">
+                  <Image
                   src="/pdc.webp"
                   alt=""
-                  className="mt-12 md:w-2/3 float-right transition duration-500 ease-in-out group-hover:shadow-3xl group-hover:backdrop-blur group-hover:rotate-[0deg] rotate-[8deg]"
+                  width={450}
+                  height={230}
+                  priority
                 />
-                <img
+                </div>
+                <div className="absolute md:-top-20 animate-fly md:-right-[10%] duration-500 ease-in-out group-hover:rotate-[8deg]">
+                <Image
                   src="/3D_elements.webp"
                   alt=""
-                  className="absolute -top-20 animate-fly md:-right-[10%] duration-500 ease-in-out group-hover:rotate-[8deg]"
+                  width={650}
+                  height={480}
+                  priority
                 />
+                </div>
               </div>
             </div>
           </div>
@@ -178,7 +186,7 @@ const Marketplace = () => {
           <img src="/gradient.jpg" alt="gradient" className="w-full" />
         </picture>
         <div className="flex flex-col items-center justify-center">
-          <div className="animate-bounce bg-white dark:bg-purple-800 p-2 w-10 h-10 ring-1 ring-slate-900/5 dark:ring-slate-200/20 shadow-lg rounded-full flex items-center justify-center">
+          <div className="animate-bounce bg-accent p-2 w-10 h-10 ring-1 ring-slate-900/5 dark:ring-slate-200/20 shadow-lg rounded-full flex items-center justify-center">
             <svg
               className="w-6 h-6 text-white"
               fill="none"
@@ -201,7 +209,7 @@ const Marketplace = () => {
                 type="search"
                 onChange={handleSearchInput}
                 className="w-full rounded-xl border border-purple-600 py-2 px-2 pl-10 text-lg text-purple-600 placeholder-jacarta-300 focus:outline-none"
-                placeholder="Search by payer address or unstoppable domain"
+                placeholder="Search by payer address"
               />
               <span className="absolute left-0 top-3.5 md:top-0 flex md:h-full w-12 items-center justify-center rounded-2xl">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" className="h-4 w-4 fill-purple-600">
@@ -225,9 +233,9 @@ const Marketplace = () => {
                 <option value={4}>Token Amount (Low-High)</option>
               </select>
             </div>
-            <button onClick = {handleRefresh} className="w-full md:w-auto mt-5 md:mt-0 btn bg-dark-purple text-white hover:bg-white hover:border-dark-purple hover:text-dark-purple">Refresh</button>
+            <button onClick = {handleRefresh} className="w-full mt-5 md:mt-0 md:w-36 rounded-xl bg-accent py-3 px-8 text-center font-semibold text-white shadow-accent-volume transition-all hover:brightness-125">Refresh</button>
           </div>
-          <div className="flex flex-wrap -m-4 mt-10 min-h-screen">
+          <div className="flex flex-wrap -m-4 mt-10 min-h-[60vh]">
             {FilteredNftList.map((item: any, index: number) => (
               <div className="p-4 lg:w-1/3" key={index}>
                 <Link href={`/pdc/${item?.tokenId}`} passHref>
@@ -235,7 +243,7 @@ const Marketplace = () => {
                     <div className="h-full relative cursor-pointer bg-gray-50 p-2 hover:shadow-xl hover:scale-105 transition duration-300 ease-in-out rounded-xl overflow-hidden">
                       <Image src={item.media[0].raw} loading="lazy" width={500} height={250} alt="img" />
                       <div className="absolute top-8 right-3">
-                          <CountDownTimer endTime={item?.rawMetadata?.attributes[1].value} />
+                          <CountDownTimer endTime={item?.rawMetadata?.attributes[1].value} fontSize={'10'} size={35}/>
                       </div>
                       <div className="flex items-center justify-between">
                         <p className="mb-2 font-bold text-start">
@@ -265,6 +273,107 @@ const Marketplace = () => {
           </div>
         </div>
       </section>
+      {/* <!-- Process / Newsletter --> */}
+      <section class="relative px-5 md:px-24 dark:bg-jacarta-900">
+        <div class="container">
+          <h2 class="mb-16 text-center font-display text-3xl text-jacarta-700">
+            Create and sell your NFTs
+          </h2>
+          <div class="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4">
+            <div class="text-center">
+              <div class="mb-6 inline-flex rounded-full bg-[#CDBCFF] p-3">
+                <div class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-violet-600">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    width="24"
+                    height="24"
+                    class="h-5 w-5 fill-white"
+                  >
+                    <path fill="none" d="M0 0h24v24H0z" />
+                    <path
+                      d="M22 6h-7a6 6 0 1 0 0 12h7v2a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h18a1 1 0 0 1 1 1v2zm-7 2h8v8h-8a4 4 0 1 1 0-8zm0 3v2h3v-2h-3z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <h3 class="mb-4 font-display text-lg text-jacarta-700">1. Set up your wallet</h3>
+              <p class="text-jacarta-300">
+                Once you've set up your wallet of choice, connect it to OpenSeaby clicking the NFT Marketplacein the top
+                right corner.
+              </p>
+            </div>
+            <div class="text-center">
+              <div class="mb-6 inline-flex rounded-full bg-[#C4F2E3] p-3">
+                <div class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-green-500">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    width="24"
+                    height="24"
+                    class="h-5 w-5 fill-white"
+                  >
+                    <path fill="none" d="M0 0h24v24H0z" />
+                    <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" />
+                  </svg>
+                </div>
+              </div>
+              <h3 class="mb-4 font-display text-lg text-jacarta-700">2. Create Your Collection</h3>
+              <p class="">
+                Click Create and set up your collection. Add social links, a description, profile & banner images, and
+                set a secondary sales fee.
+              </p>
+            </div>
+            <div class="text-center">
+              <div class="mb-6 inline-flex rounded-full bg-[#CDDFFB] p-3">
+                <div class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-blue-500">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    width="24"
+                    height="24"
+                    class="h-5 w-5 fill-white"
+                  >
+                    <path fill="none" d="M0 0h24v24H0z" />
+                    <path
+                      d="M17.409 19c-.776-2.399-2.277-3.885-4.266-5.602A10.954 10.954 0 0 1 20 11V3h1.008c.548 0 .992.445.992.993v16.014a1 1 0 0 1-.992.993H2.992A.993.993 0 0 1 2 20.007V3.993A1 1 0 0 1 2.992 3H6V1h2v4H4v7c5.22 0 9.662 2.462 11.313 7h2.096zM18 1v4h-8V3h6V1h2zm-1.5 9a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <h3 class="mb-4 font-display text-lg text-jacarta-700">3. Add Your NFTs</h3>
+              <p class="">
+                Upload your work (image, video, audio, or 3D art), add a title and description, and customize your NFTs
+                with properties, stats.
+              </p>
+            </div>
+            <div class="text-center">
+              <div class="mb-6 inline-flex rounded-full bg-[#FFD0D0] p-3">
+                <div class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-red-500">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    width="24"
+                    height="24"
+                    class="h-5 w-5 fill-white"
+                  >
+                    <path fill="none" d="M0 0h24v24H0z" />
+                    <path
+                      d="M10.9 2.1l9.899 1.415 1.414 9.9-9.192 9.192a1 1 0 0 1-1.414 0l-9.9-9.9a1 1 0 0 1 0-1.414L10.9 2.1zm2.828 8.486a2 2 0 1 0 2.828-2.829 2 2 0 0 0-2.828 2.829z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <h3 class="mb-4 font-display text-lg text-jacarta-700 ">4. List Them For Sale</h3>
+              <p class="">
+                Choose between auctions, fixed-price listings, and declining-price listings. You choose how you want to
+                sell your NFTs!
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+      {/* <!-- end process / newsletter --> */}
     </>
   );
 };

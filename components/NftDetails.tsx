@@ -15,7 +15,7 @@ import {formatDate,convertDate, hexToEth} from '../utils/web3'
 import { successAlert } from "../utils/alerts";
 import ConfirmModal from "./ConfirmModal";
 import { useRouter } from 'next/router'
-
+import { CountDownTimer } from "../components";
 
 const NftDetails = ({ pdcId }: any) => {
   const GlobalState = useContext(AppContext);
@@ -54,6 +54,7 @@ const NftDetails = ({ pdcId }: any) => {
         getNftOwner(PdcNft.contract.address, PdcNft.tokenId);
         getApproveStatus(PdcNft.tokenId);
         getNftListingStatus(PdcNft.tokenId, PdcNft);
+        getNFTStatus(PdcNft.contract.address)
       }
     } else {
       
@@ -75,6 +76,7 @@ const NftDetails = ({ pdcId }: any) => {
           getNftOwner(nftResponse.contract.address, nftResponse.tokenId);
           getApproveStatus(nftResponse.tokenId);
           getNftListingStatus(nftResponse.tokenId, nftResponse);
+          getNFTStatus(nftResponse.contract.address)
         }
       } catch (error) {
         console.log("error:  ", error);
@@ -107,6 +109,15 @@ const NftDetails = ({ pdcId }: any) => {
     }
   }
 
+  const getNFTStatus = async(contractAddress:string) =>{
+    try {
+      //const nftResponse = await alchemy.nft.summarizeNftAttributes(contractAddress);
+      //console.log("getNFTStatus: ", nftResponse);
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
   const getUdAddress = async (address:string) => {
     var config = {
       method: "get",
@@ -236,16 +247,18 @@ const NftDetails = ({ pdcId }: any) => {
       <div className="w-full scrollbar-hide h-screen overflow-scroll flex flex-col my-10 py-10 md:p-10 items-center">
         <div className="flex justify-between w-full md:w-2/3 items-center px-5 md:px-10">
           <div className="font-bold text-2xl">PDC Info</div>
-          
-            <p onClick={() => router.back()} className="flex items-center cursor-pointer text-lg font-bold">
-              <MdArrowBackIosNew /> Back
-            </p>
-          
+
+          <p onClick={() => router.back()} className="flex items-center cursor-pointer text-lg font-bold">
+            <MdArrowBackIosNew /> Back
+          </p>
         </div>
         <div className="md:flex flex-col items-center mt-5 mb-10">
           {NftData && (
             <div className="w-full p-2 md:p-10 rounded-xl bg-gray-100">
-              <div className="flex items-center justify-center">
+              <div className="relative flex items-center justify-center">
+                <div className="absolute z-30 top-16 right-8 font-bold">
+                    <CountDownTimer endTime={NftData?.rawMetadata?.attributes[1].value} fontSize={'16'} size={50}/>
+                </div>
                 <img
                   className="hover:shadow-xl z-20 rounded-xl w-[100vw] md:w-[60vw] pb-2"
                   src={NftData.rawMetadata.image}
@@ -285,7 +298,7 @@ const NftDetails = ({ pdcId }: any) => {
                 <div className=" w-full flex justify-between text-lg font-bold">
                   <div className="col text-start">Token Amount</div>
                   <div className="col text-end flex items-center">
-                    <p>{NftData.rawMetadata?.attributes[4]?.value}</p>
+                    <p>{parseInt(NftData.rawMetadata?.attributes[4]?.value).toLocaleString('en-US')}</p>
                   </div>
                 </div>
                 <div className=" w-full flex justify-between text-lg font-bold">
@@ -295,8 +308,8 @@ const NftDetails = ({ pdcId }: any) => {
                       {IsLoadingDiscount ? (
                         <img className="w-4 h-4" src="/loader.svg" alt="loader" />
                       ) : (
-                        NftData.rawMetadata?.attributes[4]?.value - DiscountValue
-                      )}{" "}
+                        (NftData.rawMetadata?.attributes[4]?.value - DiscountValue).toLocaleString('en-US')
+                      )}
                     </p>
                   </div>
                 </div>
@@ -311,6 +324,12 @@ const NftDetails = ({ pdcId }: any) => {
                   <div className="col text-end">{formatDate(NftData.timeLastUpdated)}</div>
                 </div>
                 <div className=" w-full md:flex justify-between text-lg font-bold">
+                  <div className="col md:text-start">PDC Owner</div>
+                  <div className="col md:text-end break-all">
+                    <p>{NftOwner.toLowerCase() == address?.toLowerCase() ? "You" : NftOwner}</p>
+                  </div>
+                </div>
+                <div className=" w-full md:flex justify-between text-lg font-bold">
                   <div className="col md:text-start">Payer</div>
                   <div className="col md:text-end break-all">
                     <p>{NftPayer ? NftPayer : <img className="w-4 h-4" src="/loader.svg" alt="loader" />}</p>
@@ -322,9 +341,8 @@ const NftDetails = ({ pdcId }: any) => {
                     <p>{NftPayerUd ? NftPayerUd : "-"}</p>
                   </div>
                 </div>
-                
+
                 <div className=" w-full flex flex-col items-center md:flex-row justify-center mt-10 text-lg font-bold">
-                  
                   {Date.now() < NftData.rawMetadata?.attributes[1]?.value * 1000 ? (
                     <>
                       {NftOwner?.toLowerCase() === address?.toLowerCase() && (
@@ -369,7 +387,7 @@ const NftDetails = ({ pdcId }: any) => {
                       )}
                     </>
                   ) : (
-                    <p className='text-rose-500'>Expired PDC</p>
+                    <p className="text-rose-500">Expired PDC</p>
                   )}
                 </div>
               </div>
