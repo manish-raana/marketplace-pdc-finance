@@ -372,17 +372,26 @@ const NftDetails = ({ pdcId }: any) => {
                 </div>
 
                 <div className=" w-full flex flex-col items-center md:flex-row justify-center mt-10 text-lg font-bold">
-                  {NftOwner.toLowerCase() !== address?.toLowerCase() && (
+                  {/* if wallet not connected */}
+                  {!address && (
+                    <div className="col md:text-start mb-5 mx-2">
+                      <p className="text-rose-500 font-bold">Please Connect your wallet!</p>
+                    </div>
+                  )}
+                  
+
+                  {address && NftOwner.toLowerCase() !== address?.toLowerCase() && (
                     <div className="col md:text-start mb-5 mx-2">
                       <button
                         onClick={() => setShowModal(true)}
                         className="btn btn-wide border-none bg-green-500 hover:bg-green-600 text-white font-bold"
+                        disabled={!IsListed}
                       >
-                        Buy
+                        {IsListed ? "Buy" : "Not listed on marketplace"}
                       </button>
                     </div>
                   )}
-                  {NftOwner?.toLowerCase() === address?.toLowerCase() && !IsListed && (
+                  {address && NftOwner?.toLowerCase() === address?.toLowerCase() && !IsListed && (
                     <div className="col md:text-start mb-5 mx-2">
                       <button
                         onClick={() => handleApprove(NftData.tokenId)}
@@ -401,7 +410,7 @@ const NftDetails = ({ pdcId }: any) => {
                       </button>
                     </div>
                   )}
-                  {NftOwner?.toLowerCase() === address?.toLowerCase() && !IsListed && (
+                  {address && NftOwner?.toLowerCase() === address?.toLowerCase() && !IsListed && (
                     <div className="col md:text-end mb-5 mx-2">
                       <button
                         onClick={() => handleSellNft(NftData.tokenId)}
@@ -419,7 +428,7 @@ const NftDetails = ({ pdcId }: any) => {
                     </div>
                   )}
 
-                  {NftOwner?.toLowerCase() === address?.toLowerCase() && IsListed && (
+                  {address && NftOwner?.toLowerCase() === address?.toLowerCase() && IsListed && (
                     <div className="col md:text-end mb-5 mx-2">
                       <button
                         onClick={() => deleteListing(NftData.tokenId)}
