@@ -12,7 +12,7 @@ import PdcNftMarketplaceABI from "../abi/NFTMarkepPlace.json";
 import PdcNftABI from "../abi/pdcNFT.json";
 import TokenFaucetABI from "../abi/tokenFaucetABI.json";
 import {formatDate,convertDate, hexToEth} from '../utils/web3'
-import { successAlert } from "../utils/alerts";
+import { errorAlert, successAlert } from "../utils/alerts";
 import ConfirmModal from "./ConfirmModal";
 import { useRouter } from 'next/router'
 import { CountDownTimer } from "../components";
@@ -25,6 +25,7 @@ const NftDetails = ({ pdcId }: any) => {
   const [NftOwner, setNftOwner] = useState('');
   const [DiscountPercent, setDiscountPercent] = useState(0);
   const [DiscountValue, setDiscountValue] = useState(0);
+  const [sellingDiscount, setSellingDiscount] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [IsApproved, setIsApproved] = useState(false);
   const [IsApproving, setIsApproving] = useState(false);
@@ -218,14 +219,19 @@ const NftDetails = ({ pdcId }: any) => {
   }
   const handleSellNft = async (tokenId:string) => {
     try {
+      if (sellingDiscount > 100) { 
+        errorAlert('Discount % can not be more that 100%');
+        return;
+      }
       setIsLoadingSelling(true);
       const pdcNftMarketPlaceAddress = process.env.NEXT_PUBLIC_PDC_MARKETPLACE || "";
       const contract = await sdk?.getContract(pdcNftMarketPlaceAddress, PdcNftMarketplaceABI);
-      const txResponse: any = await contract?.call("listForFinancing", parseInt(tokenId), 500);
+      const txResponse: any = await contract?.call("listForFinancing", parseInt(tokenId), sellingDiscount * 100);
       //console.log(txResponse);
       if (txResponse && txResponse.receipt) { 
         successAlert('Listed on marketplace Successfully!');
         setIsListed(true);
+        setDiscountPercent(sellingDiscount * 100);
       }
     } catch (error) {
       console.log(error)
@@ -371,6 +377,17 @@ const NftDetails = ({ pdcId }: any) => {
                   </div>
                 </div>
 
+                {IsApproved && NftOwner?.toLowerCase() === address?.toLowerCase() && !IsListed && (
+                  <div className="flex justify-center w-full">
+                    <input
+                      type="number"
+                      onChange={(event) => setSellingDiscount(parseInt(event?.target.value))}
+                      max={100}
+                      placeholder="Enter discount %"
+                      className="w-1/2 px-5 focus:outline-none font-bold text-xl rounded-lg h-12"
+                    />
+                  </div>
+                )}
                 <div className=" w-full flex flex-col items-center md:flex-row justify-center mt-10 text-lg font-bold">
                   {/* if wallet not connected */}
                   {!address && (
@@ -378,7 +395,6 @@ const NftDetails = ({ pdcId }: any) => {
                       <p className="text-rose-500 font-bold">Please Connect your wallet!</p>
                     </div>
                   )}
-                  
 
                   {address && NftOwner.toLowerCase() !== address?.toLowerCase() && (
                     <div className="col md:text-start mb-5 mx-2">
@@ -391,6 +407,7 @@ const NftDetails = ({ pdcId }: any) => {
                       </button>
                     </div>
                   )}
+
                   {address && NftOwner?.toLowerCase() === address?.toLowerCase() && !IsListed && (
                     <div className="col md:text-start mb-5 mx-2">
                       <button
@@ -411,21 +428,23 @@ const NftDetails = ({ pdcId }: any) => {
                     </div>
                   )}
                   {address && NftOwner?.toLowerCase() === address?.toLowerCase() && !IsListed && (
-                    <div className="col md:text-end mb-5 mx-2">
-                      <button
-                        onClick={() => handleSellNft(NftData.tokenId)}
-                        className="btn btn-wide border-none bg-rose-500 hover:bg-rose-600 text-white font-bold"
-                        disabled={!IsApproved || IsLoadingSelling}
-                      >
-                        {IsLoadingSelling ? (
-                          <p>
-                            Listing <img className="w-4 h-4 ml-5" src="/loader.svg" alt="loader" />
-                          </p>
-                        ) : (
-                          "List to Marketplace"
-                        )}
-                      </button>
-                    </div>
+                    <>
+                      <div className="col md:text-end mb-5 mx-2">
+                        <button
+                          onClick={() => handleSellNft(NftData.tokenId)}
+                          className="btn btn-wide border-none bg-rose-500 hover:bg-rose-600 text-white font-bold"
+                          disabled={!IsApproved || IsLoadingSelling}
+                        >
+                          {IsLoadingSelling ? (
+                            <p>
+                              Listing <img className="w-4 h-4 ml-5" src="/loader.svg" alt="loader" />
+                            </p>
+                          ) : (
+                            "List to Marketplace"
+                          )}
+                        </button>
+                      </div>
+                    </>
                   )}
 
                   {address && NftOwner?.toLowerCase() === address?.toLowerCase() && IsListed && (
