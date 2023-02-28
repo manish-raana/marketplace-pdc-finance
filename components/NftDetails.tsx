@@ -219,6 +219,10 @@ const NftDetails = ({ pdcId }: any) => {
   }
   const handleSellNft = async (tokenId:string) => {
     try {
+      if (!sellingDiscount || sellingDiscount < 1) {
+        errorAlert("Discount % should be greater than 0");
+        return;
+      }
       if (sellingDiscount > 100) { 
         errorAlert('Discount % can not be more that 100%');
         return;
