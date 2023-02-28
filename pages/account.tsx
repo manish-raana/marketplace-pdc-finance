@@ -145,6 +145,10 @@ const Account = () => {
       if(!address){
         router.push('/')
       }
+      GlobalStates.setUserNftList([]);
+      setFilteredNftList([]);
+      setNftList([]);
+      
       getAllNFT();
     }, [address]);
   return (
@@ -200,7 +204,12 @@ const Account = () => {
       </form>
 
       {/* list of nfts */}
-      <div className="flex flex-wrap -m-4 mt-10">
+      <div className="flex flex-wrap -m-4 mt-10 mb-10">
+        {FilteredNftList.length == 0 
+          && <div className="flex items-center justify-center w-full h-2/3">
+            <p>You do not have any NFT!</p>
+          </div> 
+          }
         {FilteredNftList.map((item: any, index: number) => (
           <div className="p-4 lg:w-1/3" key={index}>
             <Link href={`/pdc/${item?.tokenId}`} passHref>

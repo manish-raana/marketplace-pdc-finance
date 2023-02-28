@@ -282,6 +282,7 @@ const NftDetails = ({ pdcId }: any) => {
         Discount={DiscountPercent / 100}
         payableAmount={NftData?.rawMetadata?.attributes[4]?.value - DiscountValue}
         setNftOwner={setNftOwner}
+        setIsListed={setIsListed}
       />
       <div className="w-full scrollbar-hide h-screen overflow-scroll flex flex-col my-10 py-10 md:p-10 items-center">
         <div className="flex justify-between w-full md:w-2/3 items-center px-5 md:px-10">
