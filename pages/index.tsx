@@ -188,17 +188,13 @@ const Marketplace = () => {
 
             {/* <!-- Hero image --> */}
             <div className="col-span-5 md:col-span-6 xl:col-span-8">
-              <div className="relative group text-center md:pl-8 md:text-right">
-                <img
-                  src="/pdc.webp"
-                  alt=""
-                  className="mt-12 md:w-2/3 float-right transition duration-500 ease-in-out group-hover:shadow-3xl group-hover:backdrop-blur group-hover:rotate-[0deg] rotate-[8deg]"
-                />
-                <img
-                  src="/3D_elements.webp"
-                  alt=""
-                  className="absolute -top-20 animate-fly md:-right-[10%] duration-500 ease-in-out group-hover:rotate-[8deg]"
-                />
+              <div className="relative group pl-8 text-center pl-8 md:text-right">
+                <div className="mt-12 md:w-2/3 float-right transition duration-500 ease-in-out group-hover:shadow-3xl group-hover:backdrop-blur group-hover:rotate-[0deg] rotate-[8deg]">
+                  <Image priority width={500} height={250} src="/pdc.png" alt="" />
+                </div>
+                <div className="absolute md:-mt-10 animate-fly md:-right-[10%] duration-500 ease-in-out group-hover:rotate-[8deg]">
+                  <Image priority width={700} height={500} src="/3D_elements.webp" alt="" />
+                </div>
               </div>
             </div>
           </div>
@@ -272,18 +268,20 @@ const Marketplace = () => {
                   <div className={item?.rawMetadata?.attributes[1].value * 1000 > Date.now() ? "" : "pointer-events-none"}>
                     <div className="h-full relative cursor-pointer bg-gray-50 p-2 hover:shadow-xl hover:scale-105 transition duration-300 ease-in-out rounded-xl overflow-hidden">
                       <Image src={item.media[0].raw} loading="lazy" width={500} height={250} alt="img" />
-                      {item.discount > 0 && <div className="absolute top-0 left-32 pt-2">
-                        <div className="bg-yellow-400 text-white w-10 h-10 relative rounded-full">
-                          <span className="absolute top-0 left-0 h-full w-full">
-                            <span className="block w-full h-full absolute top-0 left-0 transform rotate-45 bg-yellow-400"></span>
-                            <span className="block w-full h-full absolute top-0 left-0 transform rotate-90 bg-yellow-400"></span>
-                            <span className="block w-full h-full absolute top-0 left-0 transform -rotate-45 bg-yellow-400"></span>
-                            <span className="block w-full h-full absolute top-0 left-0 transform -rotate-90 bg-yellow-400"></span>
-                            <span className="block w-full h-full absolute top-0 left-0 bg-yellow-400"></span>
-                          </span>
-                          <span className="inline-block relative text-sm leading-tight text-center">{item.discount}% OFF</span>
+                      {item.discount > 0 && (
+                        <div className="absolute top-0 left-32 pt-2">
+                          <div className="bg-yellow-400 text-white w-10 h-10 relative rounded-full">
+                            <span className="absolute top-0 left-0 h-full w-full">
+                              <span className="block w-full h-full absolute top-0 left-0 transform rotate-45 bg-yellow-400"></span>
+                              <span className="block w-full h-full absolute top-0 left-0 transform rotate-90 bg-yellow-400"></span>
+                              <span className="block w-full h-full absolute top-0 left-0 transform -rotate-45 bg-yellow-400"></span>
+                              <span className="block w-full h-full absolute top-0 left-0 transform -rotate-90 bg-yellow-400"></span>
+                              <span className="block w-full h-full absolute top-0 left-0 bg-yellow-400"></span>
+                            </span>
+                            <span className="inline-block relative text-sm leading-tight text-center">{item.discount}% OFF</span>
+                          </div>
                         </div>
-                      </div>}
+                      )}
                       <div className="absolute top-8 right-3">
                         <CountDownTimer endTime={item?.rawMetadata?.attributes[1].value} fontSize={"text-[10px]"} size={35} />
                       </div>

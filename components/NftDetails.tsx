@@ -131,7 +131,7 @@ const NftDetails = ({ pdcId }: any) => {
       const response = await axios(config);
       const payerUD = response?.data?.meta?.domain
       if(payerUD && payerUD !== ''){
-        //setNftPayer(payerUD);
+        setNftPayer(address);
         setNftPayerUd(payerUD);
       }else{
         setNftPayer(address);
