@@ -190,10 +190,8 @@ const Marketplace = () => {
             <div className="col-span-5 md:col-span-6 xl:col-span-8">
               <div className="relative group pl-8 text-center md:text-right">
                
-                  <img src="/pdc.webp" alt="" className="mt-12 md:w-2/3 float-right transition duration-500 ease-in-out group-hover:shadow-3xl group-hover:backdrop-blur group-hover:rotate-[0deg] rotate-[8deg]"/>
-               
-               
-                  <img src="/3D_elements.webp" alt="" className="absolute md:-mt-10 md:-right-[10%] duration-500 ease-in-out group-hover:rotate-[8deg]"/>
+                  <img src="/pdc.webp" alt="" className="mt-12 md:w-2/3 float-right rotate-[8deg]"/>
+                  <img src="/3D_elements.webp" alt="" className="absolute md:-mt-10 md:-right-[10%] "/>
                
               </div>
             </div>
