@@ -188,9 +188,9 @@ const Marketplace = () => {
 
             {/* <!-- Hero image --> */}
             <div className="col-span-5 md:col-span-6 xl:col-span-8">
-              <div className="relative group pl-8 text-center pl-8 md:text-right">
+              <div className="relative group pl-8 text-center md:text-right">
                 <div className="mt-12 md:w-2/3 float-right transition duration-500 ease-in-out group-hover:shadow-3xl group-hover:backdrop-blur group-hover:rotate-[0deg] rotate-[8deg]">
-                  <Image priority width={500} height={250} src="/pdc.png" alt="" />
+                  <Image priority unoptimized width={500} height={250} src="/pdc.webp" alt="" />
                 </div>
                 <div className="absolute md:-mt-10 animate-fly md:-right-[10%] duration-500 ease-in-out group-hover:rotate-[8deg]">
                   <Image priority width={700} height={500} src="/3D_elements.webp" alt="" />
