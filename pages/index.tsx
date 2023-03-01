@@ -207,7 +207,7 @@ const Marketplace = () => {
           <img src="/gradient.jpg" alt="gradient" className="w-full" />
         </picture>
         <div className="flex flex-col items-center justify-center">
-          <div className="animate-bounce bg-accent p-2 w-10 h-10 ring-1 ring-slate-900/5 dark:ring-slate-200/20 shadow-lg rounded-full flex items-center justify-center">
+          <div className=" bg-accent p-2 w-10 h-10 ring-1 ring-slate-900/5 dark:ring-slate-200/20 shadow-lg rounded-full flex items-center justify-center">
             <svg
               className="w-6 h-6 text-white"
               fill="none"
