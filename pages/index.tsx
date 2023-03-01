@@ -193,7 +193,7 @@ const Marketplace = () => {
                   <img src="/pdc.webp" alt="" className="mt-12 md:w-2/3 float-right transition duration-500 ease-in-out group-hover:shadow-3xl group-hover:backdrop-blur group-hover:rotate-[0deg] rotate-[8deg]"/>
                
                
-                  <img src="/3D_elements.webp" alt="" className="absolute md:-mt-10 animate-fly md:-right-[10%] duration-500 ease-in-out group-hover:rotate-[8deg]"/>
+                  <img src="/3D_elements.webp" alt="" className="absolute md:-mt-10 md:-right-[10%] duration-500 ease-in-out group-hover:rotate-[8deg]"/>
                
               </div>
             </div>
@@ -207,7 +207,7 @@ const Marketplace = () => {
           <img src="/gradient.jpg" alt="gradient" className="w-full" />
         </picture>
         <div className="flex flex-col items-center justify-center">
-          <div className=" bg-accent p-2 w-10 h-10 ring-1 ring-slate-900/5 dark:ring-slate-200/20 shadow-lg rounded-full flex items-center justify-center">
+          <div className="animate-bounce bg-accent p-2 w-10 h-10 ring-1 ring-slate-900/5 dark:ring-slate-200/20 shadow-lg rounded-full flex items-center justify-center">
             <svg
               className="w-6 h-6 text-white"
               fill="none"
