@@ -8,7 +8,7 @@ module.exports = {
       },
     },
   },
-  plugins: [require("daisyui"), require("@tailwindcss/typography")],
+  plugins: [require("tailwindcss"), require("autoprefixer"), require("daisyui"), require("@tailwindcss/typography")],
   daisyui: {
     themes: ["winter"],
   },
