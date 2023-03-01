@@ -48,7 +48,7 @@ const NavBar = () => {
       <div className="z-30 fixed navbar js-page-header top-0 w-full backdrop-blur transition-colors">
         <div className="navbar-start">
           <div className="dropdown">
-            <label className="btn btn-ghost btn-circle swap swap-rotate md:hidden">
+            {/* <label className="btn btn-ghost btn-circle swap swap-rotate md:hidden">
               <input type="checkbox" onChange={() => setShowSideMenu(!showSideMenu)} />
 
               <svg className="swap-off fill-current" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 512 512">
@@ -58,7 +58,7 @@ const NavBar = () => {
               <svg className="swap-on fill-current" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 512 512">
                 <polygon points="400 145.49 366.51 112 256 222.51 145.49 112 112 145.49 222.51 256 112 366.51 145.49 400 256 289.49 366.51 400 400 366.51 289.49 256 400 145.49" />
               </svg>
-            </label>
+            </label> */}
           </div>
           <Link href="/">
             <a className="btn btn-ghost normal-case text-xl md:block hidden">
@@ -68,7 +68,7 @@ const NavBar = () => {
 
           <Link href="/">
             <a className="btn btn-ghost flex items-center normal-case text-xl md:hidden">
-              <Image src="/logo_transparent.png" height={24} width={80} alt="pdc finance" />
+              <Image src="/logo_transparent.png" height={38} width={130} alt="pdc finance" />
             </a>
           </Link>
         </div>
@@ -89,9 +89,11 @@ const NavBar = () => {
             </a>
           )}
 
-          <FaUserAlt onClick={handleAccountNavigate} className="text-5xl mr-5 text-white bg-dark-purple p-1 rounded-full cursor-pointer" />
+          <FaUserAlt onClick={handleAccountNavigate} className="text-5xl min-w-[50px] mr-5 text-white bg-dark-purple p-1 rounded-full cursor-pointer" />
 
-          <ConnectWallet accentColor="#2C095B" colorMode="dark" />
+          <div className='connect-btn'>
+            <ConnectWallet accentColor="#2C095B" colorMode="dark" />
+          </div>
         </div>
       </div>
     </div>

@@ -8,7 +8,6 @@ const nextConfig = {
       "dummyimage.com",
       "cdn.sanity.io",
     ],
-    unoptimized: true,
   },
   env: {
     COVALENT_API_KEY: process.env.COVALENT_API_KEY,

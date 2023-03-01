@@ -296,8 +296,11 @@ const NftDetails = ({ pdcId }: any) => {
           {NftData && (
             <div className="w-full p-2 md:p-10 rounded-xl bg-gray-100">
               <div className="relative flex items-center justify-center">
-                <div className="absolute z-30 top-16 right-8 font-bold">
+                <div className="absolute z-30 top-0 md:top-16 right-8 font-bold hidden md:block">
                   <CountDownTimer endTime={NftData?.rawMetadata?.attributes[1].value} fontSize={"text-[16px]"} size={50} />
+                </div>
+                <div className="absolute z-30 top-5 right-0 font-bold md:hidden">
+                  <CountDownTimer endTime={NftData?.rawMetadata?.attributes[1].value} fontSize={"text-[10px]"} size={50} />
                 </div>
                 <img
                   className="hover:shadow-xl z-20 rounded-xl w-[100vw] md:w-[60vw] pb-2"
