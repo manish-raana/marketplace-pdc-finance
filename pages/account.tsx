@@ -152,24 +152,24 @@ const Account = () => {
       getAllNFT();
     }, [address]);
   return (
-    <section className="relative w-full pb-10 pt-20 md:pt-15 lg:h-[88vh] md:px-20">
+    <section className="relative w-full pb-10 pt-20 md:pt-15 lg:min-h-[88vh] md:px-20">
       <picture className="pointer-events-none absolute inset-x-0 top-0 -z-10">
         <img src="/gradient.jpg" alt="gradient" className="w-full" />
       </picture>
 
       <div className="container w-full flex flex-col items-center">
-        <h1 className="font-display text-3xl font-bold text-jacarta-700 lg:text-3xl xl:text-4xl">Manage your PDC NFTs</h1>
+        <h1 className="mt-10 font-display text-3xl font-bold text-jacarta-700 lg:text-3xl xl:text-4xl">Manage your PDC NFTs</h1>
       </div>
       <form action="search" className="w-full relative md:flex mb-4 mt-10 px-3">
         <div className="flex flex-grow md:w-[50vw]">
           <input
             type="search"
             onChange={handleSearchInput}
-            className="w-full rounded-xl border border-purple-600 py-2 px-2 pl-10 text-lg text-purple-600 placeholder-jacarta-300 focus:outline-none"
+            className="w-full rounded-md py-2 px-2 pl-10 text-lg text-[#004EFC] placeholder-jacarta-300 focus:outline-none"
             placeholder="Search NFT by payer address"
           />
           <span className="absolute left-2 top-3.5 md:top-0 flex md:h-full w-12 items-center justify-center rounded-2xl">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" className="h-4 w-4 fill-purple-600">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" className="h-4 w-4 fill-[#A1B4C7]">
               <path fill="none" d="M0 0h24v24H0z"></path>
               <path d="M18.031 16.617l4.283 4.282-1.415 1.415-4.282-4.283A8.96 8.96 0 0 1 11 20c-4.968 0-9-4.032-9-9s4.032-9 9-9 9 4.032 9 9a8.96 8.96 0 0 1-1.969 5.617zm-2.006-.742A6.977 6.977 0 0 0 18 11c0-3.868-3.133-7-7-7-3.868 0-7 3.132-7 7 0 3.867 3.132 7 7 7a6.977 6.977 0 0 0 4.875-1.975l.15-.15z"></path>
             </svg>
@@ -179,7 +179,7 @@ const Account = () => {
           <select
             value={sortId}
             onChange={handleSort}
-            className="select w-full border border-purple-600 focus:outline-none select-primary mt-5 md:mt-0 md:ml-5 rounded-xl"
+            className="select w-full outline-none focus:outline-none border-none select-primary mt-5 md:mt-0 md:ml-5 rounded-md"
           >
             <option value={0} disabled>
               SORT BY
@@ -194,7 +194,7 @@ const Account = () => {
           <select
             value={filterId}
             onChange={handleFilter}
-            className="select w-full border border-purple-600 focus:outline-none select-primary mt-5 md:mt-0 md:ml-5 rounded-xl"
+            className="select w-full outline-none focus:outline-none border-none select-primary mt-5 md:mt-0 md:ml-5 rounded-md"
           >
             <option value={1}>All NFTs</option>
             <option value={2}>Listed</option>
@@ -205,11 +205,11 @@ const Account = () => {
 
       {/* list of nfts */}
       <div className="flex flex-wrap -m-4 mt-10 mb-10">
-        {FilteredNftList.length == 0 
-          && <div className="flex items-center justify-center w-full h-2/3">
+        {FilteredNftList.length == 0 && (
+          <div className="flex items-center justify-center w-full h-2/3">
             <p>You do not have any NFT!</p>
-          </div> 
-          }
+          </div>
+        )}
         {FilteredNftList.map((item: any, index: number) => (
           <div className="p-4 lg:w-1/3" key={index}>
             <Link href={`/pdc/${item?.tokenId}`} passHref>
@@ -218,7 +218,7 @@ const Account = () => {
                   <Image src={item.media[0].raw} loading="lazy" width={500} height={250} alt="img" />
                   <div className="absolute top-8 right-3">
                     {item?.rawMetadata?.attributes[1].value * 1000 > Date.now() ? (
-                      <CountDownTimer endTime={item?.rawMetadata?.attributes[1].value} fontSize={'text-[10px]'} size={35}/>
+                      <CountDownTimer endTime={item?.rawMetadata?.attributes[1].value} fontSize={"text-[10px]"} size={35} lineHeight={'leading-3'} />
                     ) : (
                       <p className="mr-3 text-rose-500">Expired</p>
                     )}

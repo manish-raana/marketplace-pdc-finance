@@ -90,9 +90,9 @@ const ConfirmModal = ({
   return (
     <>
       {showModal && (
-        <div className="w-full z-40 p-2 md:p-20 border-4 border-black fixed top-0 left-0 bottom-0 right-0 bg-black bg-opacity-75">
+        <div className="w-full z-40 p-2 md:p-20 border-4 border-black fixed top-0 left-0 bottom-0 right-0 bg-[#021B45] backdrop-filter backdrop-blur-sm bg-opacity-80">
           <div className="w-full flex justify-center items-center h-screen md:h-auto">
-            <div className="w-full bg-white flex flex-col rounded-2xl bg-opacity-100 md:w-1/2 h-84">
+            <div className="w-full bg-white flex flex-col rounded-lg bg-opacity-100 md:w-1/2 h-84">
               <div className="flex items-center text-center justify-between mx-2">
                 <p className="text-center flex-grow font-bold text-2xl mt-3">Please Confirm the below details</p>
 
@@ -166,7 +166,7 @@ const ConfirmModal = ({
                 <button
                   onClick={() => handleBuyNft()}
                   className={`border border-gray-200 rounded-lg py-2 px-5 m-2 text-white font-bold hover:shadow-xl hover:text-white ${
-                    !IsTokenApproved ? "bg-gray-500 cursor-not-allowed" : "bg-green-500 hover:bg-green-800"
+                    !IsTokenApproved ? "bg-gray-500 cursor-not-allowed" : "bg-[#004EFC] hover:bg-[#588CFF]"
                   }`}
                   disabled={IsTokenApproved == false}
                 >
@@ -180,7 +180,7 @@ const ConfirmModal = ({
                 </button>
                 <button
                   onClick={() => handleModalClose()}
-                  className="border border-gray-200 bg-rose-500 text-white font-bold rounded-lg py-2 px-5 m-2 hover:bg-rose-600 hover:shadow-xl hover:text-white"
+                  className="border border-[#004EFC] hover:bg-[#588CFF] text-[#004EFC] font-bold rounded-lg py-2 px-5 m-2 hover:shadow-xl hover:text-white"
                 >
                   Cancel
                 </button>

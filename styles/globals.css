@@ -7,8 +7,12 @@ body {
   padding: 0;
   margin: 0;
   /* background:#D9D9D9; */
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  font-family: 'Poppins', sans-serif;
+  color: #303031;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
 }
 a {
   color: inherit;
@@ -55,10 +59,66 @@ a {
 .connect-btn span div button{
   min-width:140px !important;
 }
-
-@media only screen and (max-width: 400px) {
-  .css-18bzo0q{
-  padding: 0px !important;
-  font-size:14px !important;
+.heading-top{
+  font-family: 'Poppins', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 60px;
+  line-height: 122%;
 }
+.text-top{
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 150%;
+}
+.heading-hero{
+  font-weight: 600;
+  font-size: 40px;
+  line-height: 113.5%;
+}
+.heading-create{
+  font-weight: 600;
+  font-size: 40px;
+  line-height: 113.5%;
+  color: #303031;
+}
+.heading-create-2{
+  font-weight: 600;
+  font-size: 28px;
+  line-height: 30px;
+  color: #303031;
+}
+.text-create{
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: #425466;
+}
+.discount{
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 24px;
+  color:white;
+  background: #F9BC12;
+}
+.copy{
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 123%;
+  color: #A9B1BF;
+}
+@media screen and (max-width: 400px) {
+  .css-18bzo0q{
+    padding: 0px !important;
+    font-size:14px !important;
+  }
+  .heading-top{
+    font-size:30px;
+  }
+  .connect-btn span div button{
+    width:80% !important;
+    font-size:12px !important;
+    height:30px !important;
+    line-height:12px !important;
+  }
 }

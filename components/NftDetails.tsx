@@ -284,7 +284,10 @@ const NftDetails = ({ pdcId }: any) => {
         setNftOwner={setNftOwner}
         setIsListed={setIsListed}
       />
-      <div className="w-full scrollbar-hide h-screen overflow-scroll flex flex-col my-10 py-10 md:p-10 items-center">
+      <div className="w-full scrollbar-hide h-screen overflow-scroll flex flex-col my-10 mt-20 py-10 md:p-10 items-center">
+        <picture className="pointer-events-none absolute inset-x-0 top-0 -z-10">
+          <img src="/gradient.jpg" alt="gradient" className="w-full" />
+        </picture>
         <div className="flex justify-between w-full md:w-2/3 items-center px-5 md:px-10">
           <div className="font-bold text-2xl">PDC Info</div>
 
@@ -297,10 +300,10 @@ const NftDetails = ({ pdcId }: any) => {
             <div className="w-full p-2 md:p-10 rounded-xl bg-gray-100">
               <div className="relative flex items-center justify-center">
                 <div className="absolute z-30 top-0 md:top-16 right-8 font-bold hidden md:block">
-                  <CountDownTimer endTime={NftData?.rawMetadata?.attributes[1].value} fontSize={"text-[16px]"} size={50} />
+                  <CountDownTimer endTime={NftData?.rawMetadata?.attributes[1].value} fontSize={"text-[16px]"} size={50} lineHeight={"leading-5"} />
                 </div>
                 <div className="absolute z-30 top-5 right-0 font-bold md:hidden">
-                  <CountDownTimer endTime={NftData?.rawMetadata?.attributes[1].value} fontSize={"text-[10px]"} size={50} />
+                  <CountDownTimer endTime={NftData?.rawMetadata?.attributes[1].value} fontSize={"text-[10px]"} size={50} lineHeight={"leading-5"} />
                 </div>
                 <img
                   className="hover:shadow-xl z-20 rounded-xl w-[100vw] md:w-[60vw] pb-2"
